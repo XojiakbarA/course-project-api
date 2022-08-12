@@ -1,6 +1,10 @@
 package com.courseproject.api.config;
 
 import com.courseproject.api.security.jwt.AuthTokenFilter;
+import com.courseproject.api.security.oauth2.CustomOAuth2UserService;
+import com.courseproject.api.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.courseproject.api.security.oauth2.OAuth2AuthenticationFailureHandler;
+import com.courseproject.api.security.oauth2.OAuth2AuthenticationSuccessHandler;
 import com.courseproject.api.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -20,11 +24,27 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(
+        securedEnabled = true,
+        jsr250Enabled = true,
+        prePostEnabled = true
+)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+
+    @Autowired
+    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+    @Autowired
+    private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+
+    @Autowired
+    private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Bean
     public AuthTokenFilter authTokenFilter() {
@@ -34,6 +54,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
 
     @Bean
@@ -59,8 +84,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                    .authorizeRequests().antMatchers("/login", "/register").permitAll()
+                    .authorizeRequests()
+                    .antMatchers("/login", "/register").permitAll()
+                    .antMatchers("/auth/**", "/oauth2/**").permitAll()
                     .anyRequest().authenticated()
+                .and()
+                    .oauth2Login()
+                    .authorizationEndpoint()
+                    .baseUri("/oauth2/authorize")
+                    .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+                .and()
+                    .redirectionEndpoint()
+                    .baseUri("/oauth2/callback/*")
+                .and()
+                    .userInfoEndpoint()
+                    .userService(customOAuth2UserService)
+                .and()
+                    .successHandler(oAuth2AuthenticationSuccessHandler)
+                    .failureHandler(oAuth2AuthenticationFailureHandler)
                 .and()
                     .addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }

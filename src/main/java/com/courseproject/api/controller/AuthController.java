@@ -1,6 +1,7 @@
 package com.courseproject.api.controller;
 
 import com.courseproject.api.dto.UserDTO;
+import com.courseproject.api.entity.EAuthProvider;
 import com.courseproject.api.entity.ERole;
 import com.courseproject.api.entity.Role;
 import com.courseproject.api.entity.User;
@@ -99,6 +100,7 @@ public class AuthController {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRoles(roles);
+        user.setProvider(EAuthProvider.local);
         user.setImage(image);
 
         userRepository.save(user);

@@ -1,5 +1,6 @@
 package com.courseproject.api.config;
 
+import com.courseproject.api.entity.EAuthProvider;
 import com.courseproject.api.entity.ERole;
 import com.courseproject.api.entity.Role;
 import com.courseproject.api.entity.User;
@@ -43,6 +44,7 @@ public class UserDataLoader implements CommandLineRunner {
         user.setFirstName("user");
         user.setLastName("root");
         user.setEmail("user@mail.ru");
+        user.setProvider(EAuthProvider.local);
         user.setRoles(roles);
         user.setPassword(passwordEncoder.encode("123"));
 
