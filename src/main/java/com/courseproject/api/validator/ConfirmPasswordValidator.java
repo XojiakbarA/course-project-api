@@ -33,6 +33,9 @@ public class ConfirmPasswordValidator implements ConstraintValidator<ConfirmPass
                     .addPropertyNode(f)
                     .addConstraintViolation();
         });
+        if (((RegisterRequest) object).getPassword() == null || ((RegisterRequest) object).getConfirmPassword() == null) {
+            return false;
+        }
         return ((RegisterRequest) object).getPassword().equals(request.getConfirmPassword());
     }
 

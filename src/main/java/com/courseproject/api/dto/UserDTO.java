@@ -1,9 +1,9 @@
 package com.courseproject.api.dto;
 
+import com.courseproject.api.entity.Role;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
 
-import java.util.Collection;
+import java.util.Set;
 
 @Data
 public class UserDTO {
@@ -18,14 +18,8 @@ public class UserDTO {
 
     private String image;
 
-    private Collection<? extends GrantedAuthority> authorities;
+    private Boolean isNonLocked;
 
-    private Boolean enabled;
-
-    private Boolean accountNonExpired;
-
-    private Boolean accountNonLocked;
-
-    private Boolean credentialsNonExpired;
+    private Set<RoleDTO> roles;
 
 }

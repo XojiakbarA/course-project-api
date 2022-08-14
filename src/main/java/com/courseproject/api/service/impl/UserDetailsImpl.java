@@ -57,7 +57,7 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
                 user.getEmail(),
                 user.getImage(),
                 user.getPassword(),
-                user.isNonLocked(),
+                user.getIsNonLocked(),
                 authorities
         );
     }

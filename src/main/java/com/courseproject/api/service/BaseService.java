@@ -5,10 +5,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Map;
 
-public interface CloudinaryService {
+public interface BaseService {
 
-    Map upload(MultipartFile multipartFile) throws IOException;
+    String upload(MultipartFile image) throws IOException;
 
-    Map delete(String id) throws IOException;
+    Map<?,?> delete(String id) throws IOException;
 
 }

@@ -2,8 +2,9 @@ package com.courseproject.api.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.courseproject.api.service.CloudinaryService;
+import com.courseproject.api.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,18 +15,17 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
-public class CloudinaryServiceImpl implements CloudinaryService {
+public class BaseServiceImpl implements BaseService {
 
     @Autowired
     Cloudinary cloudinary;
 
     @Override
-    public Map<?,?> upload(MultipartFile multipartFile) throws IOException {
-        File file = convert(multipartFile);
+    public String upload(MultipartFile image) throws IOException  {
+        File file = convert(image);
         Map<?,?> result = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
-        System.out.println(result.get("url"));
         file.delete();
-        return result;
+        return result.get("public_id").toString();
     }
 
     @Override

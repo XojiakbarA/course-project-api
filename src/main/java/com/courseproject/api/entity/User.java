@@ -31,7 +31,7 @@ public class User extends Base {
     private String password;
 
     @Column(name = "is_non_locked", nullable = false)
-    private boolean isNonLocked = true;
+    private Boolean isNonLocked = true;
 
     @Column(name = "image")
     private String image;
