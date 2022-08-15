@@ -31,22 +31,22 @@ public class UserController {
         return response;
     }
 
-    @PutMapping("/{userId}/images/{imageId}")
+    @PutMapping("/{userId}/images")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse updateImage(@ModelAttribute ImageRequest request, @PathVariable("userId") Long userId, @PathVariable("imageId") Long imageId) throws IOException {
-        ImageDTO image = userService.updateImage(request, userId, imageId);
+    public RestResponse updateImage(@ModelAttribute ImageRequest request, @PathVariable("userId") Long userId) throws IOException {
+        ImageDTO image = userService.updateImage(request, userId);
         RestResponse response = new RestResponse();
         response.setMessage("Image updated successfully!");
         response.setContent(image);
         return response;
     }
 
-    @DeleteMapping("/{userId}/images/{imageId}")
+    @DeleteMapping("/{userId}/images")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse deleteImage(@PathVariable Long userId, @PathVariable Long imageId) throws IOException {
-        userService.deleteImage(userId, imageId);
+    public RestResponse deleteImage(@PathVariable Long userId) throws IOException {
+        userService.deleteImage(userId);
         RestResponse response = new RestResponse();
         response.setMessage("Image deleted successfully!");
         return response;
