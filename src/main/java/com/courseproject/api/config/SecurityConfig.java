@@ -9,6 +9,7 @@ import com.courseproject.api.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -85,7 +86,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                     .authorizeRequests()
-                    .antMatchers("/login", "/register", "/oauth2/**").permitAll()
+                    .antMatchers("/auth/me").authenticated()
+                    .antMatchers("/auth/login", "/auth/register", "/oauth2/**").permitAll()
+                    .antMatchers(HttpMethod.GET).permitAll()
                     .anyRequest().authenticated()
                 .and()
                     .oauth2Login()

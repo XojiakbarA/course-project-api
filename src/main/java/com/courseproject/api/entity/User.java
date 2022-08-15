@@ -31,10 +31,11 @@ public class User extends Base {
     private String password;
 
     @Column(name = "is_non_locked", nullable = false)
-    private boolean isNonLocked = true;
+    private Boolean isNonLocked = true;
 
-    @Column(name = "image")
-    private String image;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private Image image;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
