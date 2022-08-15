@@ -1,9 +1,6 @@
 package com.courseproject.api.security.oauth2;
 
-import com.courseproject.api.entity.EAuthProvider;
-import com.courseproject.api.entity.ERole;
-import com.courseproject.api.entity.Role;
-import com.courseproject.api.entity.User;
+import com.courseproject.api.entity.*;
 import com.courseproject.api.exception.OAuth2AuthenticationProcessingException;
 import com.courseproject.api.repository.RoleRepository;
 import com.courseproject.api.repository.UserRepository;
@@ -78,12 +75,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         roles.add(role);
 
         User user = new User();
+        Image image = new Image();
+        image.setValue(oAuth2UserInfo.getImageUrl());
         user.setProvider(EAuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()));
         user.setProviderId(oAuth2UserInfo.getId());
         user.setFirstName(oAuth2UserInfo.getFirstName());
         user.setLastName(oAuth2UserInfo.getLastName());
         user.setEmail(oAuth2UserInfo.getEmail());
-        user.setImage(oAuth2UserInfo.getImageUrl());
+        user.setImage(image);
         user.setRoles(roles);
         return userRepository.save(user);
     }
@@ -95,8 +94,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if (existingUser.getFirstName() == null) {
             existingUser.setLastName(oAuth2UserInfo.getLastName());
         }
-        if (existingUser.getLastName() == null) {
-            existingUser.setImage(oAuth2UserInfo.getImageUrl());
+        if (existingUser.getImage() == null) {
+            Image image = new Image();
+            image.setValue(oAuth2UserInfo.getImageUrl());
+            existingUser.setImage(image);
         }
         return userRepository.save(existingUser);
     }

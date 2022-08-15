@@ -10,6 +10,4 @@ public class UpdateRequest {
 
     private String lastName;
 
-    private MultipartFile image;
-
 }

@@ -1,5 +1,6 @@
 package com.courseproject.api.service.impl;
 
+import com.courseproject.api.entity.Image;
 import com.courseproject.api.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
 
     private String email;
 
-    private String image;
+    private Image image;
 
     @JsonIgnore
     private String password;
@@ -34,7 +35,7 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
 
     private Map<String, Object> attributes;
 
-    public UserDetailsImpl(Long id, String firstName, String lastName, String email, String image, String password, Boolean isNonLocked, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(Long id, String firstName, String lastName, String email, Image image, String password, Boolean isNonLocked, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -80,7 +81,7 @@ public class UserDetailsImpl implements OAuth2User, UserDetails {
         return lastName;
     }
 
-    public String getImage() {
+    public Image getImage() {
         return image;
     }
 

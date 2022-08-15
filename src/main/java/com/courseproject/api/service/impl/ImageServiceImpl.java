@@ -2,9 +2,10 @@ package com.courseproject.api.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.courseproject.api.service.BaseService;
+import com.courseproject.api.entity.Image;
+import com.courseproject.api.repository.ImageRepository;
+import com.courseproject.api.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,22 +16,36 @@ import java.util.Map;
 import java.util.Objects;
 
 @Service
-public class BaseServiceImpl implements BaseService {
+public class ImageServiceImpl implements ImageService {
 
     @Autowired
     Cloudinary cloudinary;
 
+    @Autowired
+    private ImageRepository imageRepository;
+
     @Override
-    public String upload(MultipartFile image) throws IOException  {
+    public void delete(Long id) throws IOException {
+        Image image = imageRepository.findById(id).orElse(null);
+        try {
+            if (image != null) {
+                deleteFromCloud(image.getValue());
+            }
+        } catch (IOException e) {
+            throw new IOException();
+        }
+        imageRepository.deleteById(id);
+    }
+
+    @Override
+    public String uploadToCloud(MultipartFile image) throws IOException  {
         File file = convert(image);
         Map<?,?> result = cloudinary.uploader().upload(file, ObjectUtils.emptyMap());
         file.delete();
         return result.get("public_id").toString();
     }
-
-    @Override
-    public Map<?,?> delete(String id) throws IOException {
-        return cloudinary.uploader().destroy(id, ObjectUtils.emptyMap());
+    private void deleteFromCloud(String id) throws IOException {
+        cloudinary.uploader().destroy(id, ObjectUtils.emptyMap());
     }
 
     private File convert(MultipartFile multipartFile) throws IOException {

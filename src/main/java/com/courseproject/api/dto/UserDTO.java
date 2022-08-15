@@ -1,5 +1,6 @@
 package com.courseproject.api.dto;
 
+import com.courseproject.api.entity.Image;
 import com.courseproject.api.entity.Role;
 import lombok.Data;
 
@@ -16,7 +17,7 @@ public class UserDTO {
 
     private String email;
 
-    private String image;
+    private ImageDTO image;
 
     private Boolean isNonLocked;
 

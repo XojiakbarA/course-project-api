@@ -8,7 +8,6 @@ import com.courseproject.api.response.JwtResponse;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.security.jwt.JwtUtils;
 import com.courseproject.api.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,9 +28,6 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     @Autowired
     private AuthenticationManager authenticationManager;
