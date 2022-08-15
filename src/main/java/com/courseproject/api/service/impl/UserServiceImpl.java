@@ -84,12 +84,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ImageDTO updateImage(ImageRequest request, Long userId, Long imageId) throws IOException {
+    public ImageDTO updateImage(ImageRequest request, Long userId) throws IOException {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User with id: " + userId + " not found.")
         );
-        user.setImage(null);
-        imageService.delete(imageId);
+        Image prevImage = user.getImage();
+        if (prevImage != null) {
+            user.setImage(null);
+            imageService.delete(prevImage.getId());
+        }
         String imageValue = imageService.uploadToCloud(request.getImage());
         Image image = new Image();
         image.setValue(imageValue);
@@ -99,12 +102,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteImage(Long userId, Long imageId) throws IOException {
+    public void deleteImage(Long userId) throws IOException {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User with id: " + userId + " not found.")
         );
-        user.setImage(null);
-        imageService.delete(imageId);
+        Image image = user.getImage();
+        if (image != null) {
+            user.setImage(null);
+            imageService.delete(image.getId());
+        }
         userRepository.save(user);
     }
 

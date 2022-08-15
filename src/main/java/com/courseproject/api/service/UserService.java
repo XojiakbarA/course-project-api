@@ -16,9 +16,9 @@ public interface UserService {
 
     void save (RegisterRequest request) throws IOException;
 
-    ImageDTO updateImage(ImageRequest request, Long userId, Long imageId) throws IOException;
+    ImageDTO updateImage(ImageRequest request, Long userId) throws IOException;
 
-    void deleteImage(Long userId, Long imageId)  throws IOException;
+    void deleteImage(Long userId)  throws IOException;
 
     Boolean existsByEmail(String email);
 
