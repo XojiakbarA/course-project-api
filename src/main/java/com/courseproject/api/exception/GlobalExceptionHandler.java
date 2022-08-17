@@ -24,7 +24,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public RestResponse handleIO(IOException e) {
         RestResponse response = new RestResponse();
-        response.setMessage("Internal server error.");
+        response.setMessage(e.getMessage());
         return response;
     }
 
