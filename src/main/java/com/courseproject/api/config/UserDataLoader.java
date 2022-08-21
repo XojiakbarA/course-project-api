@@ -1,16 +1,14 @@
 package com.courseproject.api.config;
 
 import com.courseproject.api.entity.*;
-import com.courseproject.api.repository.CollectionRepository;
-import com.courseproject.api.repository.RoleRepository;
-import com.courseproject.api.repository.TopicRepository;
-import com.courseproject.api.repository.UserRepository;
+import com.courseproject.api.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Component
@@ -24,6 +22,10 @@ public class UserDataLoader implements CommandLineRunner {
     @Autowired
     private CollectionRepository collectionRepository;
     @Autowired
+    private TagRepository tagRepository;
+    @Autowired
+    private ItemRepository itemRepository;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -32,6 +34,8 @@ public class UserDataLoader implements CommandLineRunner {
         createAdminUser();
         createTopics();
         createAdminCollections();
+        createTags();
+        createItems();
     }
 
     private void createRoles() {
@@ -80,6 +84,31 @@ public class UserDataLoader implements CommandLineRunner {
                 collection.setUser(user);
                 collectionRepository.save(collection);
             }
+        }
+    }
+
+    private void createTags() {
+        for (int i = 0; i < 10; i++) {
+            Tag tag = new Tag();
+            tag.setName("tag " + i);
+            tagRepository.save(tag);
+        }
+    }
+
+    private void createItems() {
+        for (int i = 0; i < 5; i++) {
+            long id = 1;
+            Item item = new Item();
+            Collection collection = collectionRepository.findById(id).orElse(null);
+            List<Tag> tags = tagRepository.findAll();
+            List<User> users = userRepository.findAll();
+            if (collection != null) {
+                item.setCollection(collection);
+            }
+            item.setTags(tags);
+            item.setUsers(users);
+            item.setName("Item " + i);
+            itemRepository.save(item);
         }
     }
 }

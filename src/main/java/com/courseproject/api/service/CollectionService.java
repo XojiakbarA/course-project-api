@@ -10,6 +10,8 @@ public interface CollectionService {
 
     List<CollectionDTO> getByUserId(Long id);
 
+    CollectionDTO getById(Long id);
+
     CollectionDTO store(CollectionRequest request) throws IOException;
 
     CollectionDTO update(CollectionRequest request, Long id) throws IOException;
