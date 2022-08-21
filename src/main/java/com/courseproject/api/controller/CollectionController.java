@@ -25,7 +25,7 @@ public class CollectionController {
         CollectionDTO collection = collectionService.getById(id);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setContent(collection);
+        response.setData(collection);
         return response;
     }
 
@@ -36,7 +36,7 @@ public class CollectionController {
         CollectionDTO collection = collectionService.store(request);
         RestResponse response = new RestResponse();
         response.setMessage("Collection created successfully!");
-        response.setContent(collection);
+        response.setData(collection);
         return response;
     }
 
@@ -47,7 +47,7 @@ public class CollectionController {
         CollectionDTO collection = collectionService.update(request, id);
         RestResponse response = new RestResponse();
         response.setMessage("Collection updated successfully!");
-        response.setContent(collection);
+        response.setData(collection);
         return response;
     }
 

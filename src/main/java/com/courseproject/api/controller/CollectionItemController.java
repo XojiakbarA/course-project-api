@@ -23,7 +23,7 @@ public class CollectionItemController {
         List<ItemDTO> items = itemService.getByCollectionId(collectionId);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setContent(items);
+        response.setData(items);
         return response;
     }
 

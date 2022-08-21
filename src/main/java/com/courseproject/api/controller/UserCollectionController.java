@@ -23,7 +23,7 @@ public class UserCollectionController {
         List<CollectionDTO> collections = collectionService.getByUserId(userId);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setContent(collections);
+        response.setData(collections);
         return response;
     }
 

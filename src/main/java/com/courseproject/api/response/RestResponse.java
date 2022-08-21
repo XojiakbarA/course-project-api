@@ -15,6 +15,6 @@ public class RestResponse {
 
     private Map<String, String> errors;
 
-    private Object content;
+    private Object data;
 
 }

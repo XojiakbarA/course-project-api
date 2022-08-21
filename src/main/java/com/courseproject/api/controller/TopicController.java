@@ -23,7 +23,7 @@ public class TopicController {
         List<TopicDTO> topics = topicService.getAll();
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setContent(topics);
+        response.setData(topics);
         return response;
     }
 

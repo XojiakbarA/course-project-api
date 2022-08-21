@@ -25,7 +25,7 @@ public class ItemController {
         ItemDTO item = itemService.store(request);
         RestResponse response = new RestResponse();
         response.setMessage("Item created successfully!");
-        response.setContent(item);
+        response.setData(item);
         return response;
     }
 
@@ -36,7 +36,7 @@ public class ItemController {
         ItemDTO item = itemService.update(request, id);
         RestResponse response = new RestResponse();
         response.setMessage("Item updated successfully!");
-        response.setContent(item);
+        response.setData(item);
         return response;
     }
 
