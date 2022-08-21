@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "collections")
@@ -32,5 +33,15 @@ public class Collection extends Base {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private Image image;
+
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
+    private List<Item> items;
+
+    public Long getItemsCount() {
+        if (items != null) {
+            return (long) items.size();
+        }
+        return (long) 0;
+    }
 
 }

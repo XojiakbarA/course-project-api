@@ -48,6 +48,14 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
+    public CollectionDTO getById(Long id) {
+        Collection collection = collectionRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Collection with id: " + id + " not found.")
+        );
+        return convertToDTO(collection);
+    }
+
+    @Override
     public CollectionDTO store(CollectionRequest request) throws IOException {
         Collection collection = new Collection();
         return saveCollection(collection, request);
@@ -87,20 +95,24 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     private CollectionDTO saveCollection(Collection collection, CollectionRequest request) throws IOException {
-        User user = userRepository.findById(request.getUserId()).orElseThrow(
-                () -> new ResourceNotFoundException("User with id: " + request.getUserId() + " not found.")
-        );
-        Topic topic = topicRepository.findById(request.getTopicId()).orElseThrow(
-                () -> new ResourceNotFoundException("Topic with id: " + request.getTopicId() + " not found.")
-        );
         if (request.getName() != null) {
             collection.setName(request.getName());
         }
         if (request.getDescription() != null) {
             collection.setDescription(request.getDescription());
         }
-        collection.setUser(user);
-        collection.setTopic(topic);
+        if (request.getUserId() != null) {
+            User user = userRepository.findById(request.getUserId()).orElseThrow(
+                    () -> new ResourceNotFoundException("User with id: " + request.getUserId() + " not found.")
+            );
+            collection.setUser(user);
+        }
+        if (request.getTopicId() != null) {
+            Topic topic = topicRepository.findById(request.getTopicId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Topic with id: " + request.getTopicId() + " not found.")
+            );
+            collection.setTopic(topic);
+        }
         if (request.getImage() != null && !request.getImage().isEmpty()) {
             if (collection.getImage() != null) {
                 imageService.delete(collection.getImage().getId());

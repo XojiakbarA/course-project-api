@@ -1,6 +1,6 @@
 package com.courseproject.api.request;
 
-import com.courseproject.api.validator.IsItAllowedID;
+import com.courseproject.api.validator.IsItAllowedUserID;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +15,7 @@ public class CollectionRequest {
     private String name;
 
     @NotNull(message = "User ID is required.")
-    @IsItAllowedID
+    @IsItAllowedUserID
     private Long userId;
 
     @NotNull(message = "Topic ID is required.")

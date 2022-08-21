@@ -18,6 +18,17 @@ public class CollectionController {
     @Autowired
     private CollectionService collectionService;
 
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public RestResponse show(@PathVariable Long id) {
+        CollectionDTO collection = collectionService.getById(id);
+        RestResponse response = new RestResponse();
+        response.setMessage("OK");
+        response.setContent(collection);
+        return response;
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
@@ -53,7 +64,7 @@ public class CollectionController {
     @DeleteMapping("/{collectionId}/images")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse deleteImage(@PathVariable Long collectionId) throws IOException {
+    public RestResponse destroyImage(@PathVariable Long collectionId) throws IOException {
         collectionService.destroyImage(collectionId);
         RestResponse response = new RestResponse();
         response.setMessage("Image deleted successfully!");
