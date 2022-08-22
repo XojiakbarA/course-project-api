@@ -21,6 +21,10 @@ public class ItemDTO {
 
     private Long commentsCount;
 
+    private Integer rating;
+
+    private Boolean liked;
+
     private Image image;
 
     private Date createdAt;

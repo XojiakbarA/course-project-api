@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -59,6 +61,26 @@ public class Item extends Base {
             return (long) comments.size();
         }
         return (long) 0;
+    }
+
+    public Integer getRating() {
+        if (comments != null) {
+            List<Float> ratings = comments.stream().map(comment -> comment.getRating().floatValue()).toList();
+            float sum = ratings.stream().reduce(0f, Float::sum);
+            float ave = sum / comments.size();
+            return (int) Math.ceil(ave);
+        }
+        return 0;
+    }
+
+    public Boolean getLiked() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        if (users != null) {
+            User user = users.stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
+            return user != null;
+        }
+        return false;
     }
 
 }

@@ -1,14 +1,13 @@
 package com.courseproject.api.service.impl;
 
 import com.courseproject.api.dto.ItemDTO;
-import com.courseproject.api.entity.Collection;
-import com.courseproject.api.entity.Image;
-import com.courseproject.api.entity.Item;
-import com.courseproject.api.entity.Tag;
+import com.courseproject.api.dto.UserDTO;
+import com.courseproject.api.entity.*;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.CollectionRepository;
 import com.courseproject.api.repository.ItemRepository;
 import com.courseproject.api.repository.TagRepository;
+import com.courseproject.api.repository.UserRepository;
 import com.courseproject.api.request.ItemRequest;
 import com.courseproject.api.service.ImageService;
 import com.courseproject.api.service.ItemService;
@@ -30,6 +29,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private CollectionRepository collectionRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private TagRepository tagRepository;
@@ -99,6 +101,27 @@ public class ItemServiceImpl implements ItemService {
             imageService.delete(image.getId());
         }
         itemRepository.save(item);
+    }
+
+    @Override
+    public ItemDTO likes(Long itemId, Long userId) {
+        Item item = itemRepository.findById(itemId).orElseThrow(
+                () -> new ResourceNotFoundException("Item with id: " + itemId + " not found.")
+        );
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User with id: " + userId + " not found.")
+        );
+        List<User> users = item.getUsers();
+        User foundUser = users.stream().filter(u -> u.getId().equals(userId)).findFirst().orElse(null);
+        if (foundUser == null) {
+            users.add(user);
+            item.setUsers(users);
+        } else {
+            users.remove(user);
+            item.setUsers(users);
+        }
+        Item newItem = itemRepository.save(item);
+        return convertToDTO(newItem);
     }
 
     private ItemDTO saveItem(ItemRequest request, Item item) throws IOException {

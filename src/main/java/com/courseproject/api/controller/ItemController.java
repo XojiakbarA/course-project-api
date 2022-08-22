@@ -92,4 +92,15 @@ public class ItemController {
         return response;
     }
 
+    @PutMapping("/{itemId}/likes/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public RestResponse likes(@PathVariable Long itemId, @PathVariable Long userId) {
+        ItemDTO item = itemService.likes(itemId, userId);
+        RestResponse response = new RestResponse();
+        response.setMessage("OK");
+        response.setData(item);
+        return response;
+    }
+
 }
