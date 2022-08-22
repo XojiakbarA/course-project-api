@@ -24,4 +24,6 @@ public interface ItemService {
 
     void destroyImage(Long id) throws IOException;
 
+    ItemDTO likes(Long itemId, Long userId);
+
 }
