@@ -14,6 +14,8 @@ import com.courseproject.api.service.ImageService;
 import com.courseproject.api.service.ItemService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -40,6 +42,11 @@ public class ItemServiceImpl implements ItemService {
 
     private ItemDTO convertToDTO(Item item) {
         return modelMapper.map(item, ItemDTO.class);
+    }
+
+    @Override
+    public Page<ItemDTO> getAll(PageRequest pageRequest) {
+        return itemRepository.findAll(pageRequest).map(this::convertToDTO);
     }
 
     @Override

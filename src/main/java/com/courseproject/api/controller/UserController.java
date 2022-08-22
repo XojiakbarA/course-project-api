@@ -27,7 +27,7 @@ public class UserController {
         UserDTO user = userService.update(request, id);
         RestResponse response = new RestResponse();
         response.setMessage("User updated successfully!");
-        response.setContent(user);
+        response.setData(user);
         return response;
     }
 
@@ -38,7 +38,7 @@ public class UserController {
         ImageDTO image = userService.updateImage(request, userId);
         RestResponse response = new RestResponse();
         response.setMessage("Image updated successfully!");
-        response.setContent(image);
+        response.setData(image);
         return response;
     }
 

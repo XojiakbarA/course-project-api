@@ -23,7 +23,7 @@ public class TagsController {
         List<TagDTO> tags = tagService.getAll();
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setContent(tags);
+        response.setData(tags);
         return response;
     }
 
