@@ -14,6 +14,8 @@ import com.courseproject.api.service.CollectionService;
 import com.courseproject.api.service.ImageService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -40,6 +42,11 @@ public class CollectionServiceImpl implements CollectionService {
 
     private CollectionDTO convertToDTO(Collection collection) {
         return modelMapper.map(collection, CollectionDTO.class);
+    }
+
+    @Override
+    public Page<CollectionDTO> getAll(PageRequest pageRequest) {
+        return collectionRepository.findAll(pageRequest).map(this::convertToDTO);
     }
 
     @Override
