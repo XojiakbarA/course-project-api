@@ -1,8 +1,8 @@
 package com.courseproject.api.controller;
 
-import com.courseproject.api.dto.TagDTO;
+import com.courseproject.api.dto.CommentDTO;
 import com.courseproject.api.response.RestResponse;
-import com.courseproject.api.service.TagService;
+import com.courseproject.api.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -10,20 +10,20 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tags")
-public class TagsController {
+@RequestMapping("/api/items/{itemId}/comments")
+public class ItemCommentController {
 
     @Autowired
-    private TagService tagService;
+    private CommentService commentService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse getAll() {
-        List<TagDTO> tags = tagService.getAll();
+    public RestResponse getByItemId(@PathVariable Long itemId) {
+        List<CommentDTO> comments = commentService.getByItemId(itemId);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(tags);
+        response.setData(comments);
         return response;
     }
 

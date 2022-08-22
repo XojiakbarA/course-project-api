@@ -15,7 +15,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class Comment extends Base {
 
-    @Column(name = "rating", nullable = false)
+    @Column(name = "rating", columnDefinition = "integer default 0")
     private Integer rating;
 
     @Column(name = "text", nullable = false)

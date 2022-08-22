@@ -55,6 +55,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public ItemDTO getById(Long id) {
+        Item item = itemRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Item with id: " + id + " not found.")
+        );
+        return convertToDTO(item);
+    }
+
+    @Override
     public ItemDTO store(ItemRequest request) throws IOException {
         Item item = new Item();
         return saveItem(request, item);

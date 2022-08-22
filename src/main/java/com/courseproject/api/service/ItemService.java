@@ -14,6 +14,8 @@ public interface ItemService {
 
     List<ItemDTO> getByCollectionId(Long collectionId);
 
+    ItemDTO getById(Long id);
+
     ItemDTO store(ItemRequest request) throws IOException;
 
     ItemDTO update(ItemRequest request, Long id) throws IOException;
