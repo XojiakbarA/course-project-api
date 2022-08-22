@@ -1,8 +1,9 @@
 package com.courseproject.api.exception;
 
 import com.courseproject.api.response.RestResponse;
-import org.hibernate.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -80,6 +81,20 @@ public class GlobalExceptionHandler {
     public RestResponse handleResourceExists(ResourceExistsException e) {
         RestResponse response = new RestResponse();
         response.setMessage(e.getMessage());
+        return response;
+    }
+
+    @MessageExceptionHandler(org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException.class)
+    @SendTo("/comments/errors")
+    public RestResponse handleValid(org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException e) {
+        Map<String, String> errors = new HashMap<>();
+        assert e.getBindingResult() != null;
+        for(FieldError error : e.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        RestResponse response = new RestResponse();
+        response.setMessage("Validation Failed.");
+        response.setErrors(errors);
         return response;
     }
 

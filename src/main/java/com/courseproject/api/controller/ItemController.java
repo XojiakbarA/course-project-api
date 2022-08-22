@@ -39,6 +39,17 @@ public class ItemController {
         return response;
     }
 
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public RestResponse show(@PathVariable Long id) {
+        ItemDTO item = itemService.getById(id);
+        RestResponse response = new RestResponse();
+        response.setMessage("OK");
+        response.setData(item);
+        return response;
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
