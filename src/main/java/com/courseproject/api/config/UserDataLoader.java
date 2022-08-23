@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -100,7 +101,8 @@ public class UserDataLoader implements CommandLineRunner {
             Item item = new Item();
             Tag tag = tagRepository.findById((long) 1).orElse(null);
             if (tag != null) {
-                List<Tag> tags = List.of(tag);
+                List<Tag> tags = new ArrayList<>();
+                tags.add(tag);
                 item.setTags(tags);
             }
             collectionRepository.findById((long) 1).ifPresent(item::setCollection);
