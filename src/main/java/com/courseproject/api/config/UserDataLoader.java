@@ -72,7 +72,7 @@ public class UserDataLoader implements CommandLineRunner {
     }
 
     private void createAdminCollections() {
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 30; i++) {
             long id = 1;
             User user = userRepository.findById(id).orElse(null);
             Topic topic = topicRepository.findById(id).orElse(null);
@@ -96,16 +96,15 @@ public class UserDataLoader implements CommandLineRunner {
     }
 
     private void createItems() {
-        for (int i = 0; i < 5; i++) {
-            long id = 1;
+        for (int i = 0; i < 30; i++) {
             Item item = new Item();
-            Collection collection = collectionRepository.findById(id).orElse(null);
-            List<Tag> tags = tagRepository.findAll();
-            List<User> users = userRepository.findAll();
-            if (collection != null) {
-                item.setCollection(collection);
+            Tag tag = tagRepository.findById((long) 1).orElse(null);
+            if (tag != null) {
+                List<Tag> tags = List.of(tag);
+                item.setTags(tags);
             }
-            item.setTags(tags);
+            collectionRepository.findById((long) 1).ifPresent(item::setCollection);
+            List<User> users = userRepository.findAll();
             item.setUsers(users);
             item.setName("Item " + i);
             itemRepository.save(item);

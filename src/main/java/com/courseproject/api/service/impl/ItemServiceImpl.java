@@ -1,7 +1,6 @@
 package com.courseproject.api.service.impl;
 
 import com.courseproject.api.dto.ItemDTO;
-import com.courseproject.api.dto.UserDTO;
 import com.courseproject.api.entity.*;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.CollectionRepository;
@@ -54,6 +53,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDTO> getByCollectionId(Long collectionId) {
         return itemRepository.getByCollectionId(collectionId).stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<ItemDTO> getByTagId(Long tagId, PageRequest pageRequest) {
+        return itemRepository.getByTagsId(tagId, pageRequest).map(this::convertToDTO);
     }
 
     @Override

@@ -14,6 +14,8 @@ public interface ItemService {
 
     List<ItemDTO> getByCollectionId(Long collectionId);
 
+    Page<ItemDTO> getByTagId(Long tagId, PageRequest pageRequest);
+
     ItemDTO getById(Long id);
 
     ItemDTO store(ItemRequest request) throws IOException;

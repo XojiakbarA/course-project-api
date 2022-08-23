@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "items")
@@ -65,7 +66,7 @@ public class Item extends Base {
 
     public Integer getRating() {
         if (comments != null) {
-            List<Float> ratings = comments.stream().map(comment -> comment.getRating().floatValue()).toList();
+            List<Float> ratings = comments.stream().map(comment -> comment.getRating().floatValue()).collect(Collectors.toList());
             float sum = ratings.stream().reduce(0f, Float::sum);
             float ave = sum / comments.size();
             return (int) Math.ceil(ave);
