@@ -35,7 +35,8 @@ public class CollectionController {
         Page<CollectionDTO> collections = collectionService.getAll(pageRequest);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(collections);
+        response.setData(collections.getContent());
+        response.setLast(collections.isLast());
         return response;
     }
 

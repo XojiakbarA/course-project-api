@@ -17,4 +17,6 @@ public class RestResponse {
 
     private Object data;
 
+    private Boolean last = true;
+
 }

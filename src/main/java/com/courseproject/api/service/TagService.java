@@ -8,4 +8,6 @@ public interface TagService {
 
     List<TagDTO> getAll();
 
+    TagDTO findById(Long id);
+
 }

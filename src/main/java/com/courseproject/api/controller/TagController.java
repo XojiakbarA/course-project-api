@@ -27,4 +27,15 @@ public class TagController {
         return response;
     }
 
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public RestResponse show(@PathVariable Long id) {
+        TagDTO tag = tagService.findById(id);
+        RestResponse response = new RestResponse();
+        response.setMessage("OK");
+        response.setData(tag);
+        return response;
+    }
+
 }
