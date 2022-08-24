@@ -19,8 +19,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CollectionServiceImpl implements CollectionService {
@@ -50,8 +48,8 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
-    public List<CollectionDTO> getByUserId(Long id) {
-        return collectionRepository.findByUserId(id).stream().map(this::convertToDTO).collect(Collectors.toList());
+    public Page<CollectionDTO> getByUserId(Long id, PageRequest pageRequest) {
+        return collectionRepository.findByUserId(id, pageRequest).map(this::convertToDTO);
     }
 
     @Override

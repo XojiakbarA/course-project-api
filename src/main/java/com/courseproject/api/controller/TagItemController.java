@@ -34,7 +34,8 @@ public class TagItemController {
         Page<ItemDTO> items = itemService.getByTagId(tagId, pageRequest);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(items);
+        response.setData(items.getContent());
+        response.setLast(items.isLast());
         return response;
     }
 

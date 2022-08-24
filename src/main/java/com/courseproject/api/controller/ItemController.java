@@ -35,7 +35,8 @@ public class ItemController {
         Page<ItemDTO> items = itemService.getAll(pageRequest);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(items);
+        response.setData(items.getContent());
+        response.setLast(items.isLast());
         return response;
     }
 

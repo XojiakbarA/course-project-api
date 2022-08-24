@@ -2,6 +2,7 @@ package com.courseproject.api.service.impl;
 
 import com.courseproject.api.dto.TagDTO;
 import com.courseproject.api.entity.Tag;
+import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.TagRepository;
 import com.courseproject.api.service.TagService;
 import org.modelmapper.ModelMapper;
@@ -27,6 +28,14 @@ public class TagServiceImpl implements TagService {
     @Override
     public List<TagDTO> getAll() {
         return tagRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public TagDTO findById(Long id) {
+        Tag tag = tagRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("User with id: " + id + " not found.")
+        );
+        return convertToDTO(tag);
     }
 
 }
