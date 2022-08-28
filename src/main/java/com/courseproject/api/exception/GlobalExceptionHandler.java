@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,6 +36,15 @@ public class GlobalExceptionHandler {
     public RestResponse handleBadCredentials(BadCredentialsException e) {
         RestResponse response = new RestResponse();
         response.setMessage("Invalid email and/or password.");
+        return response;
+    }
+
+    @ExceptionHandler(LockedException.class)
+    @ResponseStatus(HttpStatus.LOCKED)
+    @ResponseBody
+    public RestResponse handleLocked(LockedException e) {
+        RestResponse response = new RestResponse();
+        response.setMessage(e.getMessage());
         return response;
     }
 

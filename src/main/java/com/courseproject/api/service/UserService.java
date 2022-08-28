@@ -1,26 +1,25 @@
 package com.courseproject.api.service;
 
-import com.courseproject.api.dto.ImageDTO;
 import com.courseproject.api.dto.UserDTO;
-import com.courseproject.api.entity.Image;
 import com.courseproject.api.exception.ResourceNotFoundException;
-import com.courseproject.api.request.ImageRequest;
 import com.courseproject.api.request.RegisterRequest;
-import com.courseproject.api.request.user.UpdateRequest;
+import com.courseproject.api.request.UserRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.io.IOException;
 
 public interface UserService {
 
-    UserDTO update(UpdateRequest request, Long id) throws IOException, ResourceNotFoundException;
+    Page<UserDTO> getAll(PageRequest pageRequest);
 
-    void save (RegisterRequest request) throws IOException;
+    UserDTO update(UserRequest request, Long id) throws IOException, ResourceNotFoundException;
 
-    ImageDTO updateImage(ImageRequest request, Long userId) throws IOException;
+    UserDTO store (RegisterRequest request) throws IOException;
 
-    void deleteImage(Long userId)  throws IOException;
+    void destroy(Long id) throws IOException;
 
-    Boolean existsByEmail(String email);
+    void destroyImage(Long id) throws IOException;
 
     UserDTO findByEmail(String email);
 
