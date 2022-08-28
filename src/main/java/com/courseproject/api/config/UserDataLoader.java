@@ -33,6 +33,7 @@ public class UserDataLoader implements CommandLineRunner {
     public void run(String... args) throws Exception {
         createRoles();
         createAdminUser();
+        createUsers();
         createTopics();
         createAdminCollections();
         createTags();
@@ -51,7 +52,7 @@ public class UserDataLoader implements CommandLineRunner {
     private void createAdminUser() {
         Role adminRole = roleRepository.findByName(ERole.ADMIN).orElse(null);
         Role userRole = roleRepository.findByName(ERole.USER).orElse(null);
-        Set<Role> roles = new HashSet<>();
+        List<Role> roles = new ArrayList<>();
         roles.add(adminRole);
         roles.add(userRole);
         User user = new User();
@@ -62,6 +63,22 @@ public class UserDataLoader implements CommandLineRunner {
         user.setRoles(roles);
         user.setPassword(passwordEncoder.encode("123"));
         userRepository.save(user);
+    }
+
+    private void createUsers() {
+        for (int i = 0; i < 50; i++) {
+            Role userRole = roleRepository.findByName(ERole.USER).orElse(null);
+            List<Role> roles = new ArrayList<>();
+            roles.add(userRole);
+            User user = new User();
+            user.setFirstName("user" + i);
+            user.setLastName("root" + i);
+            user.setEmail("user" + i + "@mail.ru");
+            user.setProvider(EAuthProvider.local);
+            user.setRoles(roles);
+            user.setPassword(passwordEncoder.encode("123"));
+            userRepository.save(user);
+        }
     }
 
     private void createTopics() {
@@ -106,8 +123,6 @@ public class UserDataLoader implements CommandLineRunner {
                 item.setTags(tags);
             }
             collectionRepository.findById((long) 1).ifPresent(item::setCollection);
-            List<User> users = userRepository.findAll();
-            item.setUsers(users);
             item.setName("Item " + i);
             itemRepository.save(item);
         }

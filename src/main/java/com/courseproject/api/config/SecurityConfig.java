@@ -44,9 +44,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
-//    @Autowired
-//    private HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
-
     @Bean
     public AuthTokenFilter authTokenFilter() {
         return new AuthTokenFilter();
@@ -87,7 +84,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .authorizeRequests()
                     .antMatchers("/auth/me").authenticated()
-                    .antMatchers("/auth/login", "/auth/register", "/oauth2/**").permitAll()
+                    .antMatchers("/auth/login", "/oauth2/**").permitAll()
+                    .antMatchers(HttpMethod.POST,"/api/users").permitAll()
                     .antMatchers(HttpMethod.GET).permitAll()
                     .anyRequest().authenticated()
                 .and()

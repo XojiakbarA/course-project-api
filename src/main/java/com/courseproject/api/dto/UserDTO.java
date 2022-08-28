@@ -1,9 +1,9 @@
 package com.courseproject.api.dto;
 
-import com.courseproject.api.entity.Image;
-import com.courseproject.api.entity.Role;
+import com.courseproject.api.entity.EAuthProvider;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.Set;
 
 @Data
@@ -20,6 +20,10 @@ public class UserDTO {
     private ImageDTO image;
 
     private Boolean isNonLocked;
+
+    private EAuthProvider provider;
+
+    private Date createdAt;
 
     private Set<RoleDTO> roles;
 

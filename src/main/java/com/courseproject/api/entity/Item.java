@@ -39,7 +39,7 @@ public class Item extends Base {
     )
     private List<Tag> tags = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "item_users",
             joinColumns = @JoinColumn(name = "item_id"),
