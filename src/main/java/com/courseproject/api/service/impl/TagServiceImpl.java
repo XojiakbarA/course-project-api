@@ -4,13 +4,13 @@ import com.courseproject.api.dto.TagDTO;
 import com.courseproject.api.entity.Tag;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.TagRepository;
+import com.courseproject.api.request.TagRequest;
 import com.courseproject.api.service.TagService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TagServiceImpl implements TagService {
@@ -26,8 +26,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TagDTO> getAll() {
-        return tagRepository.findAll().stream().map(this::convertToDTO).collect(Collectors.toList());
+    public Page<TagDTO> getAll(PageRequest pageRequest) {
+        return tagRepository.findAll(pageRequest).map(this::convertToDTO);
     }
 
     @Override
@@ -36,6 +36,33 @@ public class TagServiceImpl implements TagService {
                 () -> new ResourceNotFoundException("User with id: " + id + " not found.")
         );
         return convertToDTO(tag);
+    }
+
+    @Override
+    public TagDTO store(TagRequest request) {
+        Tag tag = new Tag();
+        if (request.getName() != null) {
+            tag.setName(request.getName());
+        }
+        Tag newTag = tagRepository.save(tag);
+        return convertToDTO(newTag);
+    }
+
+    @Override
+    public TagDTO update(TagRequest request, Long id) {
+        Tag tag = tagRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Tag with id: " + id + " not found.")
+        );
+        if (request.getName() != null) {
+            tag.setName(request.getName());
+        }
+        Tag newTag = tagRepository.save(tag);
+        return convertToDTO(newTag);
+    }
+
+    @Override
+    public void destroy(Long id) {
+        tagRepository.deleteById(id);
     }
 
 }

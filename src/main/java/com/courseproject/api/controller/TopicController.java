@@ -67,7 +67,7 @@ public class TopicController {
     public RestResponse destroy(@PathVariable Long id) {
         topicService.destroy(id);
         RestResponse response = new RestResponse();
-        response.setMessage("Topic updated successfully!");
+        response.setMessage("Topic deleted successfully!");
         return response;
     }
 
