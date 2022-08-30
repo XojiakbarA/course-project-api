@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
-public class UserDataLoader implements CommandLineRunner {
+public class DataLoader implements CommandLineRunner {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -35,8 +35,8 @@ public class UserDataLoader implements CommandLineRunner {
         createAdminUser();
         createUsers();
         createTopics();
-        createAdminCollections();
         createTags();
+        createCollections();
         createItems();
     }
 
@@ -89,11 +89,20 @@ public class UserDataLoader implements CommandLineRunner {
         }
     }
 
-    private void createAdminCollections() {
-        for (int i = 0; i < 30; i++) {
-            long id = 1;
-            User user = userRepository.findById(id).orElse(null);
-            Topic topic = topicRepository.findById(id).orElse(null);
+    private void createTags() {
+        for (int i = 0; i < 10; i++) {
+            Tag tag = new Tag();
+            tag.setName("tag " + i);
+            tagRepository.save(tag);
+        }
+    }
+
+    private void createCollections() {
+        for (int i = 0; i < 60; i++) {
+            long userId = (long) (Math.random()*(50-1+1)+1);
+            long topicId = (long) (Math.random()*(10-1+1)+1);
+            User user = userRepository.findById(userId).orElse(null);
+            Topic topic = topicRepository.findById(topicId).orElse(null);
             if (user != null && topic != null) {
                 Collection collection = new Collection();
                 collection.setName("Collection " + i);
@@ -105,24 +114,18 @@ public class UserDataLoader implements CommandLineRunner {
         }
     }
 
-    private void createTags() {
-        for (int i = 0; i < 10; i++) {
-            Tag tag = new Tag();
-            tag.setName("tag " + i);
-            tagRepository.save(tag);
-        }
-    }
-
     private void createItems() {
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 120; i++) {
             Item item = new Item();
-            Tag tag = tagRepository.findById((long) 1).orElse(null);
+            long tagId = (long) (Math.random()*(10-1+1)+1);
+            Tag tag = tagRepository.findById(tagId).orElse(null);
             if (tag != null) {
                 List<Tag> tags = new ArrayList<>();
                 tags.add(tag);
                 item.setTags(tags);
             }
-            collectionRepository.findById((long) 1).ifPresent(item::setCollection);
+            long collId = (long) (Math.random()*(60-1+1)+1);
+            collectionRepository.findById(collId).ifPresent(item::setCollection);
             item.setName("Item " + i);
             itemRepository.save(item);
         }
