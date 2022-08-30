@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -51,8 +50,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDTO> getByCollectionId(Long collectionId) {
-        return itemRepository.getByCollectionId(collectionId).stream().map(this::convertToDTO).collect(Collectors.toList());
+    public Page<ItemDTO> getByCollectionId(Long collectionId, PageRequest request) {
+        return itemRepository.getByCollectionId(collectionId, request).map(this::convertToDTO);
     }
 
     @Override
