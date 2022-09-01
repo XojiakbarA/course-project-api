@@ -1,6 +1,6 @@
 package com.courseproject.api.service;
 
-import com.courseproject.api.dto.ItemDTO;
+import com.courseproject.api.dto.item.ItemDTO;
 import com.courseproject.api.request.ItemRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

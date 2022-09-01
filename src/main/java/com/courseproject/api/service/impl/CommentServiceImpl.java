@@ -1,6 +1,6 @@
 package com.courseproject.api.service.impl;
 
-import com.courseproject.api.dto.CommentDTO;
+import com.courseproject.api.dto.comment.CommentDTO;
 import com.courseproject.api.entity.Comment;
 import com.courseproject.api.entity.Item;
 import com.courseproject.api.entity.User;
@@ -12,6 +12,8 @@ import com.courseproject.api.request.CommentRequest;
 import com.courseproject.api.service.CommentService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +39,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    public Page<CommentDTO> getAll(PageRequest pageRequest) {
+        return commentRepository.findAll(pageRequest).map(this::convertToDTO);
+    }
+
+    @Override
     public List<CommentDTO> getByItemId(Long itemId) {
         return commentRepository.findByItemId(itemId).stream().map(this::convertToDTO).collect(Collectors.toList());
     }
@@ -44,6 +51,23 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDTO store(CommentRequest request) {
         Comment comment = new Comment();
+        return save(comment, request);
+    }
+
+    @Override
+    public CommentDTO update(CommentRequest request, Long id) {
+        Comment comment = commentRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Comment with id: " + id + " not found.")
+        );
+        return save(comment, request);
+    }
+
+    @Override
+    public void destroy(Long id) {
+        commentRepository.deleteById(id);
+    }
+
+    private CommentDTO save(Comment comment, CommentRequest request) {
         if (request.getRating() != null) {
             comment.setRating(request.getRating());
         }

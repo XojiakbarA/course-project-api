@@ -1,6 +1,6 @@
 package com.courseproject.api.controller;
 
-import com.courseproject.api.dto.ItemDTO;
+import com.courseproject.api.dto.item.ItemDTO;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.ItemService;
 import com.courseproject.api.util.DefaultRequestParams;

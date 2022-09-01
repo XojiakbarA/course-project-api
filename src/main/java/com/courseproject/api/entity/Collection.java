@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -35,13 +36,6 @@ public class Collection extends Base {
     private Image image;
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
-    private List<Item> items;
-
-    public Long getItemsCount() {
-        if (items != null) {
-            return (long) items.size();
-        }
-        return (long) 0;
-    }
+    private List<Item> items = new ArrayList<>();
 
 }

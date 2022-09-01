@@ -1,6 +1,6 @@
 package com.courseproject.api.controller;
 
-import com.courseproject.api.dto.CollectionDTO;
+import com.courseproject.api.dto.collection.CollectionDTO;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.CollectionService;
 import com.courseproject.api.util.DefaultRequestParams;

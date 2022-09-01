@@ -1,5 +1,8 @@
-package com.courseproject.api.dto;
+package com.courseproject.api.dto.collection;
 
+import com.courseproject.api.dto.ImageDTO;
+import com.courseproject.api.dto.TopicDTO;
+import com.courseproject.api.dto.UserDTO;
 import lombok.Data;
 
 import java.util.Date;
@@ -15,7 +18,7 @@ public class CollectionDTO {
 
     private TopicDTO topic;
 
-    private UserDTO user;
+    private CollectionUserDTO user;
 
     private ImageDTO image;
 

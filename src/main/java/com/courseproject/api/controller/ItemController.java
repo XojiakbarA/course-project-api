@@ -1,6 +1,6 @@
 package com.courseproject.api.controller;
 
-import com.courseproject.api.dto.ItemDTO;
+import com.courseproject.api.dto.item.ItemDTO;
 import com.courseproject.api.request.ItemRequest;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.ItemService;
@@ -27,7 +27,7 @@ public class ItemController {
     @ResponseBody
     public RestResponse index(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
-            @RequestParam(value = "size", defaultValue = DefaultRequestParams.SIZE) int size,
+            @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(value = "sortType", defaultValue = "ASC") Sort.Direction sortType
     ) {
