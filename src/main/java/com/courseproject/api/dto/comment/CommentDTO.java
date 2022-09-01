@@ -1,4 +1,4 @@
-package com.courseproject.api.dto;
+package com.courseproject.api.dto.comment;
 
 import lombok.Data;
 
@@ -13,7 +13,9 @@ public class CommentDTO {
 
     private Integer rating;
 
-    private UserDTO user;
+    private CommentUserDTO user;
+
+    private CommentItemDTO item;
 
     private Date createdAt;
 

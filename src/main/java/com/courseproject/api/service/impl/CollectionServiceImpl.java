@@ -1,10 +1,7 @@
 package com.courseproject.api.service.impl;
 
-import com.courseproject.api.dto.CollectionDTO;
-import com.courseproject.api.entity.Collection;
-import com.courseproject.api.entity.Image;
-import com.courseproject.api.entity.Topic;
-import com.courseproject.api.entity.User;
+import com.courseproject.api.dto.collection.CollectionDTO;
+import com.courseproject.api.entity.*;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.CollectionRepository;
 import com.courseproject.api.repository.TopicRepository;
@@ -12,6 +9,7 @@ import com.courseproject.api.repository.UserRepository;
 import com.courseproject.api.request.CollectionRequest;
 import com.courseproject.api.service.CollectionService;
 import com.courseproject.api.service.ImageService;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,7 +37,11 @@ public class CollectionServiceImpl implements CollectionService {
     private ModelMapper modelMapper;
 
     private CollectionDTO convertToDTO(Collection collection) {
-        return modelMapper.map(collection, CollectionDTO.class);
+        Converter<java.util.Collection<Item>, Long> converter = c -> (long) c.getSource().size();
+        return modelMapper
+                .typeMap(Collection.class, CollectionDTO.class)
+                .addMappings(m -> m.using(converter).map(Collection::getItems, CollectionDTO::setItemsCount))
+                .map(collection);
     }
 
     @Override

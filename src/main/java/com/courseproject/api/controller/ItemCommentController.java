@@ -1,6 +1,6 @@
 package com.courseproject.api.controller;
 
-import com.courseproject.api.dto.CommentDTO;
+import com.courseproject.api.dto.comment.CommentDTO;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;

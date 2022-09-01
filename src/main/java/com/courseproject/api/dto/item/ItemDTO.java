@@ -1,5 +1,7 @@
-package com.courseproject.api.dto;
+package com.courseproject.api.dto.item;
 
+import com.courseproject.api.dto.TagDTO;
+import com.courseproject.api.dto.item.ItemCollectionDTO;
 import com.courseproject.api.entity.Image;
 import lombok.Data;
 
@@ -15,7 +17,7 @@ public class ItemDTO {
 
     private List<TagDTO> tags;
 
-    private CollectionDTO collection;
+    private ItemCollectionDTO collection;
 
     private Long likesCount;
 
