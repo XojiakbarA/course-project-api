@@ -15,6 +15,8 @@ public class CommentDTO {
 
     private UserDTO user;
 
+    private ItemDTO item;
+
     private Date createdAt;
 
 }

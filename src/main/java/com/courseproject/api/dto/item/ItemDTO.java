@@ -15,7 +15,7 @@ public class ItemDTO {
 
     private List<TagDTO> tags;
 
-    private CollectionDTO collection;
+    private ItemCollectionDTO collection;
 
     private Long likesCount;
 
