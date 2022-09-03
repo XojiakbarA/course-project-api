@@ -38,4 +38,7 @@ public class Collection extends Base {
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
     private List<Item> items = new ArrayList<>();
 
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL)
+    private List<CustomField> customFields = new ArrayList<>();
+
 }

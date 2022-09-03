@@ -31,4 +31,6 @@ public class ItemDTO {
 
     private Date createdAt;
 
+    private List<ItemCustomValueDTO> customValues;
+
 }

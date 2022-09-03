@@ -44,7 +44,10 @@ public class Item extends Base {
     )
     private List<User> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "item")
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private List<Comment> comments;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<CustomValue> customValues = new ArrayList<>();
 
 }

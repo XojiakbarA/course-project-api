@@ -27,6 +27,8 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
+    private CustomFieldTypeRepository customFieldTypeRepository;
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -38,6 +40,7 @@ public class DataLoader implements CommandLineRunner {
         createTags();
         createCollections();
         createItems();
+        createCustomFieldTypes();
     }
 
     private void createRoles() {
@@ -128,6 +131,14 @@ public class DataLoader implements CommandLineRunner {
             collectionRepository.findById(collId).ifPresent(item::setCollection);
             item.setName("Item " + i);
             itemRepository.save(item);
+        }
+    }
+
+    private void createCustomFieldTypes() {
+        for (ECustomFieldType name : ECustomFieldType.values()) {
+            CustomFieldType customFieldType = new CustomFieldType();
+            customFieldType.setName(name);
+            customFieldTypeRepository.save(customFieldType);
         }
     }
 }
