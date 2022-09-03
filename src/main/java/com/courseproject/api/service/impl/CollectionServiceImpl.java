@@ -3,9 +3,8 @@ package com.courseproject.api.service.impl;
 import com.courseproject.api.dto.collection.CollectionDTO;
 import com.courseproject.api.entity.*;
 import com.courseproject.api.exception.ResourceNotFoundException;
-import com.courseproject.api.repository.CollectionRepository;
-import com.courseproject.api.repository.TopicRepository;
-import com.courseproject.api.repository.UserRepository;
+import com.courseproject.api.repository.*;
+import com.courseproject.api.request.CollectionCustomFieldRequest;
 import com.courseproject.api.request.CollectionRequest;
 import com.courseproject.api.service.CollectionService;
 import com.courseproject.api.service.ImageService;
@@ -15,8 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CollectionServiceImpl implements CollectionService {
@@ -29,6 +31,12 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Autowired
     private TopicRepository topicRepository;
+
+    @Autowired
+    private CustomFieldRepository customFieldRepository;
+
+    @Autowired
+    private CustomFieldTypeRepository customFieldTypeRepository;
 
     @Autowired
     private ImageService imageService;
@@ -63,12 +71,14 @@ public class CollectionServiceImpl implements CollectionService {
     }
 
     @Override
+    @Transactional
     public CollectionDTO store(CollectionRequest request) throws IOException {
         Collection collection = new Collection();
         return saveCollection(collection, request);
     }
 
     @Override
+    @Transactional
     public CollectionDTO update(CollectionRequest request, Long id) throws IOException {
         Collection collection = collectionRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Collection with id: " + id + " not found.")
@@ -130,7 +140,37 @@ public class CollectionServiceImpl implements CollectionService {
             collection.setImage(image);
         }
         Collection newCollection = collectionRepository.save(collection);
+
+        if (request.getCustomFields() != null && !request.getCustomFields().isEmpty()) {
+            List<CustomField> newCustomFields = saveCustomFields(collection, request);
+            collection.setCustomFields(newCustomFields);
+        }
+
         return convertToDTO(newCollection);
+    }
+
+    private List<CustomField> saveCustomFields(Collection collection, CollectionRequest request) {
+        if (collection.getCustomFields() != null && !collection.getCustomFields().isEmpty()) {
+            customFieldRepository.deleteAllByCollectionId(collection.getId());
+            collection.setCustomFields(new ArrayList<>());
+        }
+        List<CustomField> newCustomFields = new ArrayList<>();
+        for (CollectionCustomFieldRequest fieldRequest : request.getCustomFields()) {
+            CustomField customField = new CustomField();
+            if (fieldRequest.getName() != null) {
+                customField.setName(fieldRequest.getName());
+            }
+            if (fieldRequest.getCustomFieldTypeId() != null) {
+                CustomFieldType customFieldType = customFieldTypeRepository.findById(fieldRequest.getCustomFieldTypeId()).orElseThrow(
+                        () -> new ResourceNotFoundException("CustomFieldType with id: " + fieldRequest.getCustomFieldTypeId() + " not found.")
+                );
+                customField.setCustomFieldType(customFieldType);
+            }
+            customField.setCollection(collection);
+            CustomField newCustomField = customFieldRepository.save(customField);
+            newCustomFields.add(newCustomField);
+        }
+        return newCustomFields;
     }
 
 }

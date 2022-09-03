@@ -3,10 +3,8 @@ package com.courseproject.api.service.impl;
 import com.courseproject.api.dto.item.ItemDTO;
 import com.courseproject.api.entity.*;
 import com.courseproject.api.exception.ResourceNotFoundException;
-import com.courseproject.api.repository.CollectionRepository;
-import com.courseproject.api.repository.ItemRepository;
-import com.courseproject.api.repository.TagRepository;
-import com.courseproject.api.repository.UserRepository;
+import com.courseproject.api.repository.*;
+import com.courseproject.api.request.ItemCustomValueRequest;
 import com.courseproject.api.request.ItemRequest;
 import com.courseproject.api.service.ImageService;
 import com.courseproject.api.service.ItemService;
@@ -18,8 +16,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +37,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private TagRepository tagRepository;
+
+    @Autowired
+    private CustomValueRepository customValueRepository;
+
+    @Autowired
+    private CustomFieldRepository customFieldRepository;
 
     @Autowired
     private ImageService imageService;
@@ -108,12 +114,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDTO store(ItemRequest request) throws IOException {
         Item item = new Item();
         return saveItem(request, item);
     }
 
     @Override
+    @Transactional
     public ItemDTO update(ItemRequest request, Long id) throws IOException {
         Item item = itemRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Item with id: " + id + " not found.")
@@ -191,7 +199,38 @@ public class ItemServiceImpl implements ItemService {
             item.setImage(image);
         }
         Item newItem = itemRepository.save(item);
+
+        if (item.getCustomValues() != null && !item.getCustomValues().isEmpty()) {
+            customValueRepository.deleteAllByItemId(item.getId());
+            item.setCustomValues(new ArrayList<>());
+        }
+
+        if (request.getCustomValues() != null && !request.getCustomValues().isEmpty()) {
+            List<CustomValue> newCustomValues = saveCustomValues(item, request);
+            item.setCustomValues(newCustomValues);
+        }
+
         return convertToDTO(newItem);
+    }
+
+    private List<CustomValue> saveCustomValues(Item item, ItemRequest request) {
+        List<CustomValue> newCustomValues = new ArrayList<>();
+        for (ItemCustomValueRequest valueRequest : request.getCustomValues()) {
+            CustomValue customValue = new CustomValue();
+            if (valueRequest.getValue() != null) {
+                customValue.setValue(valueRequest.getValue());
+            }
+            if (valueRequest.getCustomFieldId() != null) {
+                CustomField customField = customFieldRepository.findById(valueRequest.getCustomFieldId()).orElseThrow(
+                        () -> new ResourceNotFoundException("CustomField with id: " + valueRequest.getCustomFieldId() + " not found.")
+                );
+                customValue.setCustomField(customField);
+            }
+            customValue.setItem(item);
+            CustomValue newCustomValue = customValueRepository.save(customValue);
+            newCustomValues.add(newCustomValue);
+        }
+        return newCustomValues;
     }
 
 }

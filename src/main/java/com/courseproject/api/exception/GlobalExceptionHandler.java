@@ -14,19 +14,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(IOException.class)
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
-    public RestResponse handleIO(IOException e) {
+    public RestResponse handle(Exception e) {
         RestResponse response = new RestResponse();
-        response.setMessage(e.getMessage());
+        response.setMessage("Internal Server Error");
         return response;
     }
 
