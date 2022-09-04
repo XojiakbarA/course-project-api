@@ -4,6 +4,7 @@ import com.courseproject.api.response.RestResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.validation.BindException;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +28,15 @@ public class GlobalExceptionHandler {
     public RestResponse handle(Exception e) {
         RestResponse response = new RestResponse();
         response.setMessage("Internal Server Error");
+        return response;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public RestResponse handleAuthentication(AccessDeniedException e) {
+        RestResponse response = new RestResponse();
+        response.setMessage("Forbidden");
         return response;
     }
 
@@ -58,6 +69,15 @@ public class GlobalExceptionHandler {
         RestResponse response = new RestResponse();
         response.setMessage("Validation Failed.");
         response.setErrors(errors);
+        return response;
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public RestResponse handleConstraintViolation(ConstraintViolationException e) {
+        RestResponse response = new RestResponse();
+        response.setMessage(e.getMessage());
         return response;
     }
 

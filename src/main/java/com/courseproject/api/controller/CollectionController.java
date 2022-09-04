@@ -5,11 +5,13 @@ import com.courseproject.api.request.CollectionRequest;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.CollectionService;
 import com.courseproject.api.util.DefaultRequestParams;
+import com.courseproject.api.validator.IsItAllowedCollectionID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -17,6 +19,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/collections")
+@Validated
 public class CollectionController {
 
     @Autowired
@@ -65,7 +68,7 @@ public class CollectionController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse update(@Valid @ModelAttribute CollectionRequest request, @PathVariable Long id) throws IOException {
+    public RestResponse update(@Valid @ModelAttribute CollectionRequest request, @PathVariable @IsItAllowedCollectionID Long id) throws IOException {
         CollectionDTO collection = collectionService.update(request, id);
         RestResponse response = new RestResponse();
         response.setMessage("Collection updated successfully!");
@@ -76,18 +79,18 @@ public class CollectionController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse destroy(@PathVariable Long id) throws IOException {
+    public RestResponse destroy(@PathVariable @IsItAllowedCollectionID Long id) throws IOException {
         collectionService.destroy(id);
         RestResponse response = new RestResponse();
         response.setMessage("Collection deleted successfully!");
         return response;
     }
 
-    @DeleteMapping("/{collectionId}/images")
+    @DeleteMapping("/{id}/images")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse destroyImage(@PathVariable Long collectionId) throws IOException {
-        collectionService.destroyImage(collectionId);
+    public RestResponse destroyImage(@PathVariable @IsItAllowedCollectionID Long id) throws IOException {
+        collectionService.destroyImage(id);
         RestResponse response = new RestResponse();
         response.setMessage("Image deleted successfully!");
         return response;

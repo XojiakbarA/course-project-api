@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -53,6 +54,7 @@ public class TagController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse store(@Valid @RequestBody TagRequest request) {
         TagDTO tag = tagService.store(request);
         RestResponse response = new RestResponse();
@@ -64,6 +66,7 @@ public class TagController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse update(@Valid @RequestBody TagRequest request, @PathVariable Long id) {
         TagDTO tag = tagService.update(request, id);
         RestResponse response = new RestResponse();
@@ -75,6 +78,7 @@ public class TagController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse destroy(@PathVariable Long id) {
         tagService.destroy(id);
         RestResponse response = new RestResponse();

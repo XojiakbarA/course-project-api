@@ -28,6 +28,7 @@ public class JwtUtils {
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expired))
                 .signWith(SignatureAlgorithm.HS256, secret)
+                .claim("roles", userDetails.getAuthorities())
                 .compact();
     }
 

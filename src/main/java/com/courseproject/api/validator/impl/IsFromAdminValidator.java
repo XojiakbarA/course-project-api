@@ -1,6 +1,7 @@
-package com.courseproject.api.validator;
+package com.courseproject.api.validator.impl;
 
 import com.courseproject.api.entity.ERole;
+import com.courseproject.api.validator.IsFromAdmin;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 

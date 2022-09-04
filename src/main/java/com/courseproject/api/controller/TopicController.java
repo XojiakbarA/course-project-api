@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -42,6 +43,7 @@ public class TopicController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse store(@Valid @RequestBody TopicRequest request) {
         TopicDTO topic = topicService.store(request);
         RestResponse response = new RestResponse();
@@ -53,6 +55,7 @@ public class TopicController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse update(@Valid @RequestBody TopicRequest request, @PathVariable Long id) {
         TopicDTO topic = topicService.update(request, id);
         RestResponse response = new RestResponse();
@@ -64,6 +67,7 @@ public class TopicController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse destroy(@PathVariable Long id) {
         topicService.destroy(id);
         RestResponse response = new RestResponse();
