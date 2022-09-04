@@ -1,6 +1,7 @@
-package com.courseproject.api.validator;
+package com.courseproject.api.validator.impl;
 
 import com.courseproject.api.request.RegisterRequest;
+import com.courseproject.api.validator.ConfirmPassword;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;

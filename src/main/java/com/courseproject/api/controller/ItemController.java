@@ -5,11 +5,13 @@ import com.courseproject.api.request.ItemRequest;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.ItemService;
 import com.courseproject.api.util.DefaultRequestParams;
+import com.courseproject.api.validator.IsAllowedItemID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -17,6 +19,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/items")
+@Validated
 public class ItemController {
 
     @Autowired
@@ -65,7 +68,7 @@ public class ItemController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse update(@Valid @ModelAttribute ItemRequest request, @PathVariable Long id) throws IOException {
+    public RestResponse update(@Valid @ModelAttribute ItemRequest request, @PathVariable @IsAllowedItemID Long id) throws IOException {
         ItemDTO item = itemService.update(request, id);
         RestResponse response = new RestResponse();
         response.setMessage("Item updated successfully!");
@@ -76,18 +79,18 @@ public class ItemController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse destroy(@PathVariable Long id) throws IOException {
+    public RestResponse destroy(@PathVariable @IsAllowedItemID Long id) throws IOException {
         itemService.destroy(id);
         RestResponse response = new RestResponse();
         response.setMessage("Item deleted successfully!");
         return response;
     }
 
-    @DeleteMapping("/{itemId}/images")
+    @DeleteMapping("/{id}/images")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse destroyImage(@PathVariable Long itemId) throws IOException {
-        itemService.destroyImage(itemId);
+    public RestResponse destroyImage(@PathVariable @IsAllowedItemID Long id) throws IOException {
+        itemService.destroyImage(id);
         RestResponse response = new RestResponse();
         response.setMessage("Image deleted successfully!");
         return response;

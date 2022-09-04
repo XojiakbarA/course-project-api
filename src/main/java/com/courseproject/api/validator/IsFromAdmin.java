@@ -1,5 +1,7 @@
 package com.courseproject.api.validator;
 
+import com.courseproject.api.validator.impl.IsFromAdminValidator;
+
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;

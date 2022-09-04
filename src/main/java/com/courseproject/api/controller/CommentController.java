@@ -1,6 +1,7 @@
 package com.courseproject.api.controller;
 
 import com.courseproject.api.dto.comment.CommentDTO;
+import com.courseproject.api.entity.ERole;
 import com.courseproject.api.request.CommentRequest;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.CommentService;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -44,6 +46,7 @@ public class CommentController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse store(@Valid @RequestBody CommentRequest request) {
         CommentDTO comment = commentService.store(request);
         RestResponse response = new RestResponse();
@@ -55,6 +58,7 @@ public class CommentController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse update(@Valid @RequestBody CommentRequest request, @PathVariable Long id) {
         CommentDTO comment = commentService.update(request, id);
         RestResponse response = new RestResponse();
@@ -66,6 +70,7 @@ public class CommentController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
+    @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse destroy(@PathVariable Long id) {
         commentService.destroy(id);
         RestResponse response = new RestResponse();
