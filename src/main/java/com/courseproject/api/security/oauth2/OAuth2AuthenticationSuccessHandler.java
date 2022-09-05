@@ -5,7 +5,9 @@ import com.courseproject.api.security.jwt.JwtUtils;
 import com.courseproject.api.util.CookieUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -17,12 +19,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Locale;
 import java.util.Optional;
 
 import static com.courseproject.api.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Component
 public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
+
+    private final Locale locale = LocaleContextHolder.getLocale();
 
     private JwtUtils jwtUtils;
 
@@ -31,6 +36,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Value("${app.oauth2.authorizedRedirectUri}")
     private String authorizedRedirectUri;
 
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     OAuth2AuthenticationSuccessHandler(JwtUtils jwtUtils, HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository) {
@@ -57,8 +64,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         }
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
         String token = jwtUtils.generateToken(authentication);
+        String message = messageSource.getMessage("auth.loggedIn", null, locale);
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token)
+                .queryParam("message", message)
                 .build().toUriString();
     }
 

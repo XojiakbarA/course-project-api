@@ -1,13 +1,12 @@
 package com.courseproject.api.validator.impl;
 
-import com.courseproject.api.entity.ERole;
+import com.courseproject.api.entity.enums.ERole;
 import com.courseproject.api.validator.IsFromAdmin;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.ArrayList;
 import java.util.List;
 
 public class IsFromAdminValidator implements ConstraintValidator<IsFromAdmin, Object> {

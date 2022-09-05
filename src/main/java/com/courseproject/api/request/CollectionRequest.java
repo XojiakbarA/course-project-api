@@ -16,19 +16,19 @@ import java.util.stream.Collectors;
 @Data
 public class CollectionRequest {
 
-    @NotNull(message = "Name is required.")
-    @NotBlank(message = "Name is required.")
+    @NotNull(message = "{name.required}")
+    @NotBlank(message = "{name.required}")
     private String name;
 
-    @NotNull(message = "User ID is required.")
-    @IsItAllowedUserID
+    @NotNull(message = "{userId.required}")
+    @IsItAllowedUserID(message = "{admin.user}")
     private Long userId;
 
-    @NotNull(message = "Topic ID is required.")
+    @NotNull(message = "topicId.required")
     private Long topicId;
 
-    @NotNull(message = "Description is required.")
-    @NotBlank(message = "Description is required.")
+    @NotNull(message = "{description.required}")
+    @NotBlank(message = "{description.required}")
     private String description;
 
     private MultipartFile image;

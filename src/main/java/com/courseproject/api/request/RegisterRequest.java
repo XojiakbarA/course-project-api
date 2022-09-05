@@ -11,34 +11,34 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-@ConfirmPassword(field = "password", fieldMatch = "confirmPassword")
+@ConfirmPassword(field = "password", fieldMatch = "confirmPassword", message = "{password.notMatch}")
 public class RegisterRequest {
 
-    @NotNull(message = "First Name is required.")
-    @NotBlank(message = "First Name is required.")
+    @NotNull(message = "{firstName.required}")
+    @NotBlank(message = "{firstName.required}")
     private String firstName;
 
-    @NotNull(message = "Last Name is required.")
-    @NotBlank(message = "Last Name is required.")
+    @NotNull(message = "{lastName.required}")
+    @NotBlank(message = "{lastName.required}")
     private String lastName;
 
-    @NotNull(message = "Email is required.")
-    @NotBlank(message = "Email is required.")
-    @Email(message = "Enter a valid Email.")
+    @NotNull(message = "{email.required}")
+    @NotBlank(message = "{email.required}")
+    @Email(message = "{email.valid}")
     private String email;
 
-    @NotNull(message = "Password is required.")
-    @NotBlank(message = "Password is required.")
+    @NotNull(message = "{password.required}")
+    @NotBlank(message = "{password.required}")
     private String password;
 
-    @NotNull(message = "Password is required.")
-    @NotBlank(message = "Password is required.")
+    @NotNull(message = "{confirmPassword.required}")
+    @NotBlank(message = "{confirmPassword.required}")
     private String confirmPassword;
 
-    @IsFromAdmin
+    @IsFromAdmin(message = "{admin.user}")
     private Boolean isNonLocked;
 
-    @IsFromAdmin
+    @IsFromAdmin(message = "{admin.user}")
     private List<Long> roleIds;
 
     private MultipartFile image;

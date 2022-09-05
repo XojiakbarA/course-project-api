@@ -1,6 +1,6 @@
 package com.courseproject.api.dto;
 
-import com.courseproject.api.entity.ERole;
+import com.courseproject.api.entity.enums.ERole;
 import lombok.Data;
 
 @Data

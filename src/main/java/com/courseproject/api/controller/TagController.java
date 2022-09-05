@@ -6,6 +6,7 @@ import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.TagService;
 import com.courseproject.api.util.DefaultRequestParams;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/tags")
@@ -21,6 +23,9 @@ public class TagController {
 
     @Autowired
     private TagService tagService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -55,10 +60,11 @@ public class TagController {
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
-    public RestResponse store(@Valid @RequestBody TagRequest request) {
+    public RestResponse store(@Valid @RequestBody TagRequest request, Locale locale) {
         TagDTO tag = tagService.store(request);
+        String message = messageSource.getMessage("tag.created", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Tag created successfully!");
+        response.setMessage(message);
         response.setData(tag);
         return response;
     }
@@ -67,10 +73,11 @@ public class TagController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
-    public RestResponse update(@Valid @RequestBody TagRequest request, @PathVariable Long id) {
+    public RestResponse update(@Valid @RequestBody TagRequest request, @PathVariable Long id, Locale locale) {
         TagDTO tag = tagService.update(request, id);
+        String message = messageSource.getMessage("tag.updated", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Tag updated successfully!");
+        response.setMessage(message);
         response.setData(tag);
         return response;
     }
@@ -79,10 +86,11 @@ public class TagController {
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
-    public RestResponse destroy(@PathVariable Long id) {
+    public RestResponse destroy(@PathVariable Long id, Locale locale) {
         tagService.destroy(id);
+        String message = messageSource.getMessage("tag.deleted", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Tag deleted successfully!");
+        response.setMessage(message);
         return response;
     }
 

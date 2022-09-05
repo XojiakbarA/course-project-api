@@ -11,18 +11,18 @@ import java.util.List;
 @Data
 public class UserRequest {
 
-    @NotNull(message = "First Name is required.")
-    @NotBlank(message = "First Name is required.")
+    @NotNull(message = "{firstName.required}")
+    @NotBlank(message = "{firstName.required}")
     private String firstName;
 
-    @NotNull(message = "Last Name is required.")
-    @NotBlank(message = "Last Name is required.")
+    @NotNull(message = "{lastName.required}")
+    @NotBlank(message = "{lastName.required}")
     private String lastName;
 
-    @IsFromAdmin
+    @IsFromAdmin(message = "{admin.user}")
     private Boolean isNonLocked;
 
-    @IsFromAdmin
+    @IsFromAdmin(message = "{admin.user}")
     private List<Long> roleIds;
 
     private MultipartFile image;

@@ -8,15 +8,24 @@ import com.courseproject.api.request.TopicRequest;
 import com.courseproject.api.service.TopicService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
 @Service
 public class TopicServiceImpl implements TopicService {
 
+    private final Locale locale = LocaleContextHolder.getLocale();
+
     @Autowired
     private TopicRepository topicRepository;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -42,8 +51,10 @@ public class TopicServiceImpl implements TopicService {
 
     @Override
     public TopicDTO update(TopicRequest request, Long id) {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("topic.notFound", arguments, locale);
         Topic topic = topicRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Topic with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         if (request.getName() != null) {
             topic.setName(request.getName());

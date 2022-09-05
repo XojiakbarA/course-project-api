@@ -1,6 +1,6 @@
 package com.courseproject.api.dto;
 
-import com.courseproject.api.entity.EAuthProvider;
+import com.courseproject.api.entity.enums.EAuthProvider;
 import lombok.Data;
 
 import java.util.Date;

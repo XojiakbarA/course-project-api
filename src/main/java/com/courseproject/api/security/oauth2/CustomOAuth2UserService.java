@@ -1,6 +1,8 @@
 package com.courseproject.api.security.oauth2;
 
 import com.courseproject.api.entity.*;
+import com.courseproject.api.entity.enums.EAuthProvider;
+import com.courseproject.api.entity.enums.ERole;
 import com.courseproject.api.exception.OAuth2AuthenticationProcessingException;
 import com.courseproject.api.repository.RoleRepository;
 import com.courseproject.api.repository.UserRepository;
@@ -8,6 +10,8 @@ import com.courseproject.api.security.oauth2.user.OAuth2UserInfo;
 import com.courseproject.api.security.oauth2.user.OAuth2UserInfoFactory;
 import com.courseproject.api.service.impl.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -22,11 +26,16 @@ import java.util.*;
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
+    private final Locale locale = LocaleContextHolder.getLocale();
+
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
@@ -47,7 +56,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         );
 
         if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
-            throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
+            String message = messageSource.getMessage("oauth2.email.notFound", null, locale);
+            throw new OAuth2AuthenticationProcessingException(message);
         }
 
         Optional<User> userOptional = userRepository.findByEmail(oAuth2UserInfo.getEmail());
@@ -55,12 +65,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if(userOptional.isPresent()) {
             user = userOptional.get();
             if(!user.getProvider().equals(EAuthProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()))) {
-                throw new OAuth2AuthenticationProcessingException("Looks like you're signed up with " +
-                        user.getProvider() + " account. Please use your " + user.getProvider() +
-                        " account to login.");
+                Object[] arguments = new Object[] { user.getProvider() };
+                String message = messageSource.getMessage("oauth2.signedUp", arguments, locale);
+                throw new OAuth2AuthenticationProcessingException(message);
             }
             if (!user.getIsNonLocked()) {
-                throw new OAuth2AuthenticationProcessingException("User account is locked");
+                String message = messageSource.getMessage("error.locked", null, locale);
+                throw new OAuth2AuthenticationProcessingException(message);
             }
             user = updateExistingUser(user, oAuth2UserInfo);
         } else {
