@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 
 @RestController
@@ -29,6 +30,17 @@ public class ItemController {
 
     @Autowired
     private MessageSource messageSource;
+
+    @GetMapping("/search/{key}")
+    @ResponseStatus(HttpStatus.OK)
+    @ResponseBody
+    public RestResponse search(@PathVariable String key) {
+        List<ItemDTO> items = itemService.search(key);
+        RestResponse response = new RestResponse();
+        response.setMessage("OK");
+        response.setData(items);
+        return response;
+    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)

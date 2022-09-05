@@ -6,8 +6,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.io.IOException;
+import java.util.List;
 
 public interface ItemService {
+
+    List<ItemDTO> search(String key);
 
     Page<ItemDTO> getAll(PageRequest pageRequest);
 
