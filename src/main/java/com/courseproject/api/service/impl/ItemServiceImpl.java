@@ -8,6 +8,9 @@ import com.courseproject.api.request.ItemCustomValueRequest;
 import com.courseproject.api.request.ItemRequest;
 import com.courseproject.api.service.ImageService;
 import com.courseproject.api.service.ItemService;
+import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.mapper.orm.Search;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +61,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private ItemDTO convertToDTO(Item item) {
         Converter<java.util.Collection<User>, Long> likesConverter = c -> {
@@ -96,6 +103,18 @@ public class ItemServiceImpl implements ItemService {
                 .addMappings(m -> m.using(ratingConverter).map(Item::getComments, ItemDTO::setRating))
                 .addMappings(m -> m.using(likedConverter).map(Item::getUsers, ItemDTO::setLiked))
                 .map(item);
+    }
+
+    @Override
+    public List<ItemDTO> search(String key) {
+        SearchSession searchSession = Search.session(entityManager);
+        SearchResult<Item> result = searchSession.search(Item.class)
+                .where( f -> f.match()
+                        .fields("name", "collection.name", "collection.description", "tags.name")
+                        .matching(key))
+                .fetchAll();
+        List<Item> hits = result.hits();
+        return hits.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
