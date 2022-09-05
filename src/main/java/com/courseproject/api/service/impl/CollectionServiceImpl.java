@@ -11,6 +11,8 @@ import com.courseproject.api.service.ImageService;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -19,9 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class CollectionServiceImpl implements CollectionService {
+
+    private final Locale locale = LocaleContextHolder.getLocale();
 
     @Autowired
     private CollectionRepository collectionRepository;
@@ -40,6 +45,9 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -64,8 +72,10 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public CollectionDTO getById(Long id) {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("collection.notFound", arguments, locale);
         Collection collection = collectionRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Collection with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         return convertToDTO(collection);
     }
@@ -80,16 +90,20 @@ public class CollectionServiceImpl implements CollectionService {
     @Override
     @Transactional
     public CollectionDTO update(CollectionRequest request, Long id) throws IOException {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("collection.notFound", arguments, locale);
         Collection collection = collectionRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Collection with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         return saveCollection(collection, request);
     }
 
     @Override
     public void destroy(Long id) throws IOException {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("collection.notFound", arguments, locale);
         Collection collection = collectionRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Collection with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         Image image = collection.getImage();
         if (image != null) {
@@ -100,8 +114,10 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public void destroyImage(Long id) throws IOException {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("collection.notFound", arguments, locale);
         Collection collection = collectionRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Collection with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         Image image = collection.getImage();
         if (image != null) {
@@ -119,14 +135,18 @@ public class CollectionServiceImpl implements CollectionService {
             collection.setDescription(request.getDescription());
         }
         if (request.getUserId() != null) {
+            Object[] arguments = new Object[] { request.getUserId() };
+            String message = messageSource.getMessage("user.notFound", arguments, locale);
             User user = userRepository.findById(request.getUserId()).orElseThrow(
-                    () -> new ResourceNotFoundException("User with id: " + request.getUserId() + " not found.")
+                    () -> new ResourceNotFoundException(message)
             );
             collection.setUser(user);
         }
         if (request.getTopicId() != null) {
+            Object[] arguments = new Object[] { request.getTopicId() };
+            String message = messageSource.getMessage("topic.notFound", arguments, locale);
             Topic topic = topicRepository.findById(request.getTopicId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Topic with id: " + request.getTopicId() + " not found.")
+                    () -> new ResourceNotFoundException(message)
             );
             collection.setTopic(topic);
         }
@@ -161,8 +181,10 @@ public class CollectionServiceImpl implements CollectionService {
                 customField.setName(fieldRequest.getName());
             }
             if (fieldRequest.getCustomFieldTypeId() != null) {
+                Object[] arguments = new Object[] { fieldRequest.getCustomFieldTypeId() };
+                String message = messageSource.getMessage("customFieldType.notFound", arguments, locale);
                 CustomFieldType customFieldType = customFieldTypeRepository.findById(fieldRequest.getCustomFieldTypeId()).orElseThrow(
-                        () -> new ResourceNotFoundException("CustomFieldType with id: " + fieldRequest.getCustomFieldTypeId() + " not found.")
+                        () -> new ResourceNotFoundException(message)
                 );
                 customField.setCustomFieldType(customFieldType);
             }

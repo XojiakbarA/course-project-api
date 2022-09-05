@@ -1,7 +1,7 @@
 package com.courseproject.api.validator.impl;
 
 import com.courseproject.api.entity.Collection;
-import com.courseproject.api.entity.ERole;
+import com.courseproject.api.entity.enums.ERole;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.CollectionRepository;
 import com.courseproject.api.validator.IsItAllowedCollectionID;

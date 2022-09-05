@@ -11,6 +11,8 @@ import com.courseproject.api.service.ItemService;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
@@ -21,10 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
+
+    private final Locale locale = LocaleContextHolder.getLocale();
 
     @Autowired
     private ItemRepository itemRepository;
@@ -46,6 +51,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -107,8 +115,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDTO getById(Long id) {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("item.notFound", arguments, locale);
         Item item = itemRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Item with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         return convertToDTO(item);
     }
@@ -123,16 +133,20 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemDTO update(ItemRequest request, Long id) throws IOException {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("item.notFound", arguments, locale);
         Item item = itemRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Item with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         return saveItem(request, item);
     }
 
     @Override
     public void destroy(Long id) throws IOException {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("item.notFound", arguments, locale);
         Item item = itemRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Item with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         Image image = item.getImage();
         if (image != null) {
@@ -143,8 +157,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void destroyImage(Long id) throws IOException {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("item.notFound", arguments, locale);
         Item item = itemRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Item with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         Image image = item.getImage();
         if (image != null) {
@@ -156,11 +172,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDTO likes(Long itemId, Long userId) {
+        Object[] itemArguments = new Object[] { itemId };
+        String itemMessage = messageSource.getMessage("item.notFound", itemArguments, locale);
         Item item = itemRepository.findById(itemId).orElseThrow(
-                () -> new ResourceNotFoundException("Item with id: " + itemId + " not found.")
+                () -> new ResourceNotFoundException(itemMessage)
         );
+        Object[] userArguments = new Object[] { userId };
+        String userMessage = messageSource.getMessage("user.notFound", userArguments, locale);
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User with id: " + userId + " not found.")
+                () -> new ResourceNotFoundException(userMessage)
         );
         List<User> users = item.getUsers();
         User foundUser = users.stream().filter(u -> u.getId().equals(userId)).findFirst().orElse(null);
@@ -180,8 +200,10 @@ public class ItemServiceImpl implements ItemService {
             item.setName(request.getName());
         }
         if (request.getCollectionId() != null) {
+            Object[] arguments = new Object[] { request.getCollectionId() };
+            String message = messageSource.getMessage("collection.notFound", arguments, locale);
             Collection collection = collectionRepository.findById(request.getCollectionId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Collection with id: " + request.getCollectionId() + " not found.")
+                    () -> new ResourceNotFoundException(message)
             );
             item.setCollection(collection);
         }
@@ -221,8 +243,10 @@ public class ItemServiceImpl implements ItemService {
                 customValue.setValue(valueRequest.getValue());
             }
             if (valueRequest.getCustomFieldId() != null) {
+                Object[] arguments = new Object[] { valueRequest.getCustomFieldId() };
+                String message = messageSource.getMessage("customField.notFound", arguments, locale);
                 CustomField customField = customFieldRepository.findById(valueRequest.getCustomFieldId()).orElseThrow(
-                        () -> new ResourceNotFoundException("CustomField with id: " + valueRequest.getCustomFieldId() + " not found.")
+                        () -> new ResourceNotFoundException(message)
                 );
                 customValue.setCustomField(customField);
             }

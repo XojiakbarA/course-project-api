@@ -8,8 +8,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class TopicRequest {
 
-    @NotNull(message = "Name is required.")
-    @NotBlank(message = "Name is required.")
+    @NotNull(message = "{name.required}")
+    @NotBlank(message = "{name.required}")
     private String name;
 
 }

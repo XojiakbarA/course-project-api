@@ -1,6 +1,8 @@
 package com.courseproject.api.exception;
 
 import com.courseproject.api.response.RestResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -17,57 +19,66 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ResponseBody
-    public RestResponse handle(Exception e) {
-        RestResponse response = new RestResponse();
-        response.setMessage("Internal Server Error");
-        return response;
-    }
+    @Autowired
+    private MessageSource messageSource;
+
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    @ResponseBody
+//    public RestResponse handle(Exception e, Locale locale) {
+//        String message = messageSource.getMessage("error.internal", null, locale);
+//        RestResponse response = new RestResponse();
+//        response.setMessage(message);
+//        return response;
+//    }
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
-    public RestResponse handleAuthentication(AccessDeniedException e) {
+    public RestResponse handleAuthentication(AccessDeniedException e, Locale locale) {
+        String message = messageSource.getMessage("error.forbidden", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Forbidden");
+        response.setMessage(message);
         return response;
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public RestResponse handleBadCredentials(BadCredentialsException e) {
+    public RestResponse handleBadCredentials(BadCredentialsException e, Locale locale) {
+        String message = messageSource.getMessage("error.login", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Invalid email and/or password.");
+        response.setMessage(message);
         return response;
     }
 
     @ExceptionHandler(LockedException.class)
     @ResponseStatus(HttpStatus.LOCKED)
     @ResponseBody
-    public RestResponse handleLocked(LockedException e) {
+    public RestResponse handleLocked(LockedException e, Locale locale) {
+        String message = messageSource.getMessage("error.locked", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage(e.getMessage());
+        response.setMessage(message);
         return response;
     }
 
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public RestResponse handleBind(BindException e) {
+    public RestResponse handleBind(BindException e, Locale locale) {
         Map<String, String> errors = new HashMap<>();
         for(FieldError error : e.getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
         }
+        String message = messageSource.getMessage("error.badRequest", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Validation Failed.");
+        response.setMessage(message);
         response.setErrors(errors);
         return response;
     }
@@ -84,13 +95,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public RestResponse handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+    public RestResponse handleMethodArgumentNotValid(MethodArgumentNotValidException e, Locale locale) {
         Map<String, String> errors = new HashMap<>();
         for(FieldError error : e.getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
         }
+        String message = messageSource.getMessage("error.badRequest", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Validation Failed.");
+        response.setMessage(message);
         response.setErrors(errors);
         return response;
     }
@@ -115,14 +127,18 @@ public class GlobalExceptionHandler {
 
     @MessageExceptionHandler(org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException.class)
     @SendTo("/comments/errors")
-    public RestResponse handleValid(org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException e) {
+    public RestResponse handleValid(
+            org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException e,
+            Locale locale
+            ) {
         Map<String, String> errors = new HashMap<>();
         assert e.getBindingResult() != null;
         for(FieldError error : e.getBindingResult().getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
         }
+        String message = messageSource.getMessage("error.badRequest", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Validation Failed.");
+        response.setMessage(message);
         response.setErrors(errors);
         return response;
     }

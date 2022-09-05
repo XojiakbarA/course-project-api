@@ -7,6 +7,7 @@ import com.courseproject.api.service.ItemService;
 import com.courseproject.api.util.DefaultRequestParams;
 import com.courseproject.api.validator.IsAllowedItemID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/items")
@@ -24,6 +26,9 @@ public class ItemController {
 
     @Autowired
     private ItemService itemService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -57,10 +62,11 @@ public class ItemController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public RestResponse store(@Valid @ModelAttribute ItemRequest request) throws IOException {
+    public RestResponse store(@Valid @ModelAttribute ItemRequest request, Locale locale) throws IOException {
         ItemDTO item = itemService.store(request);
+        String message = messageSource.getMessage("item.created", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Item created successfully!");
+        response.setMessage(message);
         response.setData(item);
         return response;
     }
@@ -68,10 +74,13 @@ public class ItemController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse update(@Valid @ModelAttribute ItemRequest request, @PathVariable @IsAllowedItemID Long id) throws IOException {
+    public RestResponse update(
+            @Valid @ModelAttribute ItemRequest request,
+            @PathVariable @IsAllowedItemID Long id, Locale locale) throws IOException {
         ItemDTO item = itemService.update(request, id);
+        String message = messageSource.getMessage("item.updated", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Item updated successfully!");
+        response.setMessage(message);
         response.setData(item);
         return response;
     }
@@ -79,20 +88,22 @@ public class ItemController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse destroy(@PathVariable @IsAllowedItemID Long id) throws IOException {
+    public RestResponse destroy(@PathVariable @IsAllowedItemID Long id, Locale locale) throws IOException {
         itemService.destroy(id);
+        String message = messageSource.getMessage("item.deleted", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Item deleted successfully!");
+        response.setMessage(message);
         return response;
     }
 
     @DeleteMapping("/{id}/images")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse destroyImage(@PathVariable @IsAllowedItemID Long id) throws IOException {
+    public RestResponse destroyImage(@PathVariable @IsAllowedItemID Long id, Locale locale) throws IOException {
         itemService.destroyImage(id);
+        String message = messageSource.getMessage("image.deleted", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Image deleted successfully!");
+        response.setMessage(message);
         return response;
     }
 

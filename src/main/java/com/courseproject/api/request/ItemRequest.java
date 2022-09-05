@@ -17,16 +17,16 @@ import java.util.stream.Collectors;
 @Data
 public class ItemRequest {
 
-    @NotNull(message = "Name is required.")
-    @NotBlank(message = "Name is required.")
+    @NotNull(message = "{name.required}")
+    @NotBlank(message = "{name.required}")
     private String name;
 
-    @NotNull(message = "Collection ID is required.")
-    @IsItAllowedCollectionID
+    @NotNull(message = "{collectionId.required}")
+    @IsItAllowedCollectionID(message = "{admin.collection}")
     private Long collectionId;
 
-    @NotNull(message = "Tag IDs is required.")
-    @NotEmpty(message = "Tag IDs is required.")
+    @NotNull(message = "{tagIds.required}")
+    @NotEmpty(message = "{tagIds.required}")
     private List<Long> tagIds;
 
     private MultipartFile image;

@@ -1,6 +1,9 @@
 package com.courseproject.api.config;
 
 import com.courseproject.api.entity.*;
+import com.courseproject.api.entity.enums.EAuthProvider;
+import com.courseproject.api.entity.enums.ECustomFieldType;
+import com.courseproject.api.entity.enums.ERole;
 import com.courseproject.api.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

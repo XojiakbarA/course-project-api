@@ -2,6 +2,8 @@ package com.courseproject.api.service.impl;
 
 import com.courseproject.api.dto.UserDTO;
 import com.courseproject.api.entity.*;
+import com.courseproject.api.entity.enums.EAuthProvider;
+import com.courseproject.api.entity.enums.ERole;
 import com.courseproject.api.exception.ResourceExistsException;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.RoleRepository;
@@ -12,6 +14,8 @@ import com.courseproject.api.service.ImageService;
 import com.courseproject.api.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,9 +24,12 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private final Locale locale = LocaleContextHolder.getLocale();
 
     @Autowired
     private UserRepository userRepository;
@@ -32,6 +39,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -50,8 +60,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO update(UserRequest request, Long id) throws IOException {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("user.notFound", arguments, locale);
         User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         if (request.getFirstName() != null) {
             user.setFirstName(request.getFirstName());
@@ -78,8 +90,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO store(RegisterRequest request) throws IOException {
+        String message = messageSource.getMessage("user.notFound", null, locale);
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResourceExistsException("Email is already taken!");
+            throw new ResourceExistsException(message);
         }
         User user = new User();
 
@@ -111,8 +124,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void destroy(Long id) throws IOException {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("user.notFound", arguments, locale);
         User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         Image image = user.getImage();
         if (image != null) {
@@ -123,8 +138,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void destroyImage(Long id) throws IOException {
+        Object[] arguments = new Object[] { id };
+        String message = messageSource.getMessage("user.notFound", arguments, locale);
         User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("User with id: " + id + " not found.")
+                () -> new ResourceNotFoundException(message)
         );
         Image image = user.getImage();
         if (image != null) {

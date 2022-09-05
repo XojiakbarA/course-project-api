@@ -1,6 +1,6 @@
 package com.courseproject.api.validator.impl;
 
-import com.courseproject.api.entity.ERole;
+import com.courseproject.api.entity.enums.ERole;
 import com.courseproject.api.entity.User;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.UserRepository;

@@ -7,6 +7,7 @@ import com.courseproject.api.service.CollectionService;
 import com.courseproject.api.util.DefaultRequestParams;
 import com.courseproject.api.validator.IsItAllowedCollectionID;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Locale;
 
 @RestController
 @RequestMapping("/api/collections")
@@ -24,6 +26,9 @@ public class CollectionController {
 
     @Autowired
     private CollectionService collectionService;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -57,10 +62,11 @@ public class CollectionController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ResponseBody
-    public RestResponse store(@Valid @ModelAttribute CollectionRequest request) throws IOException {
+    public RestResponse store(@Valid @ModelAttribute CollectionRequest request, Locale locale) throws IOException {
         CollectionDTO collection = collectionService.store(request);
+        String message = messageSource.getMessage("collection.created", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Collection created successfully!");
+        response.setMessage(message);
         response.setData(collection);
         return response;
     }
@@ -68,10 +74,13 @@ public class CollectionController {
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse update(@Valid @ModelAttribute CollectionRequest request, @PathVariable @IsItAllowedCollectionID Long id) throws IOException {
+    public RestResponse update(
+            @Valid @ModelAttribute CollectionRequest request,
+            @PathVariable @IsItAllowedCollectionID Long id, Locale locale) throws IOException {
         CollectionDTO collection = collectionService.update(request, id);
+        String message = messageSource.getMessage("collection.updated", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Collection updated successfully!");
+        response.setMessage(message);
         response.setData(collection);
         return response;
     }
@@ -79,20 +88,22 @@ public class CollectionController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse destroy(@PathVariable @IsItAllowedCollectionID Long id) throws IOException {
+    public RestResponse destroy(@PathVariable @IsItAllowedCollectionID Long id, Locale locale) throws IOException {
         collectionService.destroy(id);
+        String message = messageSource.getMessage("collection.deleted", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Collection deleted successfully!");
+        response.setMessage(message);
         return response;
     }
 
     @DeleteMapping("/{id}/images")
     @ResponseStatus(HttpStatus.OK)
     @ResponseBody
-    public RestResponse destroyImage(@PathVariable @IsItAllowedCollectionID Long id) throws IOException {
+    public RestResponse destroyImage(@PathVariable @IsItAllowedCollectionID Long id, Locale locale) throws IOException {
         collectionService.destroyImage(id);
+        String message = messageSource.getMessage("image.deleted", null, locale);
         RestResponse response = new RestResponse();
-        response.setMessage("Image deleted successfully!");
+        response.setMessage(message);
         return response;
     }
 

@@ -1,6 +1,6 @@
 package com.courseproject.api.security.oauth2.user;
 
-import com.courseproject.api.entity.EAuthProvider;
+import com.courseproject.api.entity.enums.EAuthProvider;
 import com.courseproject.api.exception.OAuth2AuthenticationProcessingException;
 
 import java.util.Map;
