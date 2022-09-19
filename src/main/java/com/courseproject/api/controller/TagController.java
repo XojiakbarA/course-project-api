@@ -29,7 +29,6 @@ public class TagController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse index(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
@@ -47,7 +46,6 @@ public class TagController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse show(@PathVariable Long id) {
         TagDTO tag = tagService.findById(id);
         RestResponse response = new RestResponse();
@@ -58,7 +56,6 @@ public class TagController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse store(@Valid @RequestBody TagRequest request, Locale locale) {
         TagDTO tag = tagService.store(request);
@@ -71,7 +68,6 @@ public class TagController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse update(@Valid @RequestBody TagRequest request, @PathVariable Long id, Locale locale) {
         TagDTO tag = tagService.update(request, id);
@@ -84,7 +80,6 @@ public class TagController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse destroy(@PathVariable Long id, Locale locale) {
         tagService.destroy(id);

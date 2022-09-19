@@ -32,7 +32,6 @@ public class CollectionController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse index(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
@@ -50,7 +49,6 @@ public class CollectionController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse show(@PathVariable Long id) {
         CollectionDTO collection = collectionService.getById(id);
         RestResponse response = new RestResponse();
@@ -61,7 +59,6 @@ public class CollectionController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
     public RestResponse store(@Valid @ModelAttribute CollectionRequest request, Locale locale) throws IOException {
         CollectionDTO collection = collectionService.store(request);
         String message = messageSource.getMessage("collection.created", null, locale);
@@ -73,7 +70,6 @@ public class CollectionController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse update(
             @Valid @ModelAttribute CollectionRequest request,
             @PathVariable @IsItAllowedCollectionID Long id, Locale locale) throws IOException {
@@ -87,7 +83,6 @@ public class CollectionController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse destroy(@PathVariable @IsItAllowedCollectionID Long id, Locale locale) throws IOException {
         collectionService.destroy(id);
         String message = messageSource.getMessage("collection.deleted", null, locale);
@@ -98,7 +93,6 @@ public class CollectionController {
 
     @DeleteMapping("/{id}/images")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse destroyImage(@PathVariable @IsItAllowedCollectionID Long id, Locale locale) throws IOException {
         collectionService.destroyImage(id);
         String message = messageSource.getMessage("image.deleted", null, locale);

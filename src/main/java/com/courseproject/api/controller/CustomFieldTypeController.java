@@ -18,7 +18,6 @@ public class CustomFieldTypeController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse index() {
         List<CustomFieldTypeDTO> customFieldTypes = customFieldTypeService.findAll();
         RestResponse response = new RestResponse();

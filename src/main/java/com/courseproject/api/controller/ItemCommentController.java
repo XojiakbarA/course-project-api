@@ -18,7 +18,6 @@ public class ItemCommentController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse getByItemId(@PathVariable Long itemId) {
         List<CommentDTO> comments = commentService.getByItemId(itemId);
         RestResponse response = new RestResponse();

@@ -31,7 +31,6 @@ public class CommentController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse index(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
@@ -49,7 +48,6 @@ public class CommentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse store(@Valid @RequestBody CommentRequest request, Locale locale) {
         CommentDTO comment = commentService.store(request);
@@ -62,7 +60,6 @@ public class CommentController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse update(@Valid @RequestBody CommentRequest request, @PathVariable Long id, Locale locale) {
         CommentDTO comment = commentService.update(request, id);
@@ -75,7 +72,6 @@ public class CommentController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse destroy(@PathVariable Long id, Locale locale) {
         commentService.destroy(id);

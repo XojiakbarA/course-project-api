@@ -18,7 +18,6 @@ public class RoleController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse index() {
         List<RoleDTO> roles = roleService.getAll();
         RestResponse response = new RestResponse();

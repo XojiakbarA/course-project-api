@@ -32,7 +32,6 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse index(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
@@ -50,7 +49,6 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
     public RestResponse store(@Valid @ModelAttribute RegisterRequest request, Locale locale) throws IOException {
         UserDTO user = userService.store(request);
         String message = messageSource.getMessage("user.created", null, locale);
@@ -62,7 +60,6 @@ public class UserController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse update(@Valid @ModelAttribute UserRequest request, @PathVariable Long id, Locale locale) throws IOException, ResourceNotFoundException {
         UserDTO user = userService.update(request, id);
         String message = messageSource.getMessage("user.updated", null, locale);
@@ -74,7 +71,6 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse destroy(@PathVariable Long id, Locale locale) throws IOException {
         userService.destroy(id);
@@ -86,7 +82,6 @@ public class UserController {
 
     @DeleteMapping("/{id}/images")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse destroyImage(@PathVariable Long id, Locale locale) throws IOException {
         userService.destroyImage(id);
         String message = messageSource.getMessage("image.deleted", null, locale);

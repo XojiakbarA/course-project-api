@@ -20,7 +20,6 @@ public class UserCollectionController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse getByUserId(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = DefaultRequestParams.SIZE) int size,

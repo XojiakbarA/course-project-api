@@ -33,7 +33,6 @@ public class ItemController {
 
     @GetMapping("/search/{key}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse search(@PathVariable String key) {
         List<ItemDTO> items = itemService.search(key);
         RestResponse response = new RestResponse();
@@ -44,7 +43,6 @@ public class ItemController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse index(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
@@ -62,7 +60,6 @@ public class ItemController {
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse show(@PathVariable Long id) {
         ItemDTO item = itemService.getById(id);
         RestResponse response = new RestResponse();
@@ -73,7 +70,6 @@ public class ItemController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
     public RestResponse store(@Valid @ModelAttribute ItemRequest request, Locale locale) throws IOException {
         ItemDTO item = itemService.store(request);
         String message = messageSource.getMessage("item.created", null, locale);
@@ -85,7 +81,6 @@ public class ItemController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse update(
             @Valid @ModelAttribute ItemRequest request,
             @PathVariable @IsAllowedItemID Long id, Locale locale) throws IOException {
@@ -99,7 +94,6 @@ public class ItemController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse destroy(@PathVariable @IsAllowedItemID Long id, Locale locale) throws IOException {
         itemService.destroy(id);
         String message = messageSource.getMessage("item.deleted", null, locale);
@@ -110,7 +104,6 @@ public class ItemController {
 
     @DeleteMapping("/{id}/images")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse destroyImage(@PathVariable @IsAllowedItemID Long id, Locale locale) throws IOException {
         itemService.destroyImage(id);
         String message = messageSource.getMessage("image.deleted", null, locale);
@@ -121,7 +114,6 @@ public class ItemController {
 
     @PutMapping("/{itemId}/likes/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse likes(@PathVariable Long itemId, @PathVariable Long userId) {
         ItemDTO item = itemService.likes(itemId, userId);
         RestResponse response = new RestResponse();

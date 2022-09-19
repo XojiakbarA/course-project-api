@@ -37,7 +37,6 @@ public class AuthController {
 
     @GetMapping(value = "/me")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public UserDTO me(Authentication authentication, Locale locale) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         if (!userDetails.isAccountNonLocked()) {
@@ -49,7 +48,6 @@ public class AuthController {
 
     @PostMapping(value = "/login")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public JwtResponse login(@Valid @RequestBody LoginRequest request, Locale locale) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())

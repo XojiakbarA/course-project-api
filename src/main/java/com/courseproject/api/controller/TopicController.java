@@ -29,7 +29,6 @@ public class TopicController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse index(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
@@ -47,7 +46,6 @@ public class TopicController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse store(@Valid @RequestBody TopicRequest request, Locale locale) {
         TopicDTO topic = topicService.store(request);
@@ -60,7 +58,6 @@ public class TopicController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse update(@Valid @RequestBody TopicRequest request, @PathVariable Long id, Locale locale) {
         TopicDTO topic = topicService.update(request, id);
@@ -73,7 +70,6 @@ public class TopicController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse destroy(@PathVariable Long id, Locale locale) {
         topicService.destroy(id);
