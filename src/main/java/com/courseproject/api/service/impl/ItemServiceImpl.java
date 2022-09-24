@@ -1,25 +1,19 @@
 package com.courseproject.api.service.impl;
 
-import com.courseproject.api.dto.item.ItemDTO;
 import com.courseproject.api.entity.*;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.*;
 import com.courseproject.api.request.ItemCustomValueRequest;
 import com.courseproject.api.request.ItemRequest;
-import com.courseproject.api.service.ImageService;
-import com.courseproject.api.service.ItemService;
+import com.courseproject.api.service.*;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.session.SearchSession;
-import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -39,134 +32,78 @@ public class ItemServiceImpl implements ItemService {
     private ItemRepository itemRepository;
 
     @Autowired
-    private CollectionRepository collectionRepository;
+    private CollectionService collectionService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private TagRepository tagRepository;
+    private TagService tagService;
 
     @Autowired
-    private CustomValueRepository customValueRepository;
+    private CustomValueService customValueService;
 
     @Autowired
-    private CustomFieldRepository customFieldRepository;
+    private CustomFieldService customFieldService;
 
     @Autowired
     private ImageService imageService;
 
     @Autowired
     private MessageSource messageSource;
-
-    @Autowired
-    private ModelMapper modelMapper;
-
     @Autowired
     private EntityManager entityManager;
 
-    private ItemDTO convertToDTO(Item item) {
-        Converter<java.util.Collection<User>, Long> likesConverter = c -> {
-            if (c.getSource() != null) {
-                return (long) c.getSource().size();
-            }
-            return (long) 0;
-        };
-        Converter<java.util.Collection<Comment>, Long> commentsConverter = c -> {
-            if (c.getSource() != null) {
-                return (long) c.getSource().size();
-            }
-            return (long) 0;
-        };
-        Converter<java.util.Collection<Comment>, Integer> ratingConverter = c -> {
-            if (c.getSource() != null) {
-                List<Float> ratings = c.getSource().stream().map(comment -> comment.getRating().floatValue()).collect(Collectors.toList());
-                float sum = ratings.stream().reduce(0f, Float::sum);
-                float ave = sum / c.getSource().size();
-                return (int) Math.ceil(ave);
-            }
-            return 0;
-        };
-        Converter<java.util.Collection<User>, Boolean> likedConverter = c -> {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            String email = authentication.getName();
-            if (c.getSource() != null) {
-                User user = c.getSource().stream().filter(u -> u.getEmail().equals(email)).findFirst().orElse(null);
-                return user != null;
-            }
-            return false;
-        };
-        return modelMapper
-                .typeMap(Item.class, ItemDTO.class)
-                .addMappings(m -> m.using(likesConverter).map(Item::getUsers, ItemDTO::setLikesCount))
-                .addMappings(m -> m.using(commentsConverter).map(Item::getComments, ItemDTO::setCommentsCount))
-                .addMappings(m -> m.using(ratingConverter).map(Item::getComments, ItemDTO::setRating))
-                .addMappings(m -> m.using(likedConverter).map(Item::getUsers, ItemDTO::setLiked))
-                .map(item);
-    }
-
     @Override
-    public List<ItemDTO> search(String key) {
+    public List<Item> search(String key) {
         SearchSession searchSession = Search.session(entityManager);
         SearchResult<Item> result = searchSession.search(Item.class)
                 .where( f -> f.match()
                         .fields("name", "collection.name", "collection.description", "tags.name")
                         .matching(key))
                 .fetchAll();
-        List<Item> hits = result.hits();
-        return hits.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return result.hits();
     }
 
     @Override
-    public Page<ItemDTO> getAll(PageRequest pageRequest) {
-        return itemRepository.findAll(pageRequest).map(this::convertToDTO);
+    public Page<Item> getAll(PageRequest pageRequest) {
+        return itemRepository.findAll(pageRequest);
     }
 
     @Override
-    public Page<ItemDTO> getByCollectionId(Long collectionId, PageRequest request) {
-        return itemRepository.getByCollectionId(collectionId, request).map(this::convertToDTO);
+    public Page<Item> getByCollectionId(Long collectionId, PageRequest request) {
+        return itemRepository.getByCollectionId(collectionId, request);
     }
 
     @Override
-    public Page<ItemDTO> getByTagId(Long tagId, PageRequest pageRequest) {
-        return itemRepository.getByTagsId(tagId, pageRequest).map(this::convertToDTO);
+    public Page<Item> getByTagId(Long tagId, PageRequest pageRequest) {
+        return itemRepository.getByTagsId(tagId, pageRequest);
     }
 
     @Override
-    public ItemDTO getById(Long id) {
+    public Item getById(Long id) {
         Object[] arguments = new Object[] { id };
         String message = messageSource.getMessage("item.notFound", arguments, locale);
-        Item item = itemRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
-        return convertToDTO(item);
+        return itemRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(message));
     }
 
     @Override
     @Transactional
-    public ItemDTO store(ItemRequest request) throws IOException {
+    public Item save(ItemRequest request) throws IOException {
         Item item = new Item();
         return saveItem(request, item);
     }
 
     @Override
     @Transactional
-    public ItemDTO update(ItemRequest request, Long id) throws IOException {
-        Object[] arguments = new Object[] { id };
-        String message = messageSource.getMessage("item.notFound", arguments, locale);
-        Item item = itemRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
+    public Item update(ItemRequest request, Long id) throws IOException {
+        Item item = getById(id);
         return saveItem(request, item);
     }
 
     @Override
     public void destroy(Long id) throws IOException {
-        Object[] arguments = new Object[] { id };
-        String message = messageSource.getMessage("item.notFound", arguments, locale);
-        Item item = itemRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
+        Item item = getById(id);
         Image image = item.getImage();
         if (image != null) {
             imageService.delete(image.getId());
@@ -176,11 +113,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void destroyImage(Long id) throws IOException {
-        Object[] arguments = new Object[] { id };
-        String message = messageSource.getMessage("item.notFound", arguments, locale);
-        Item item = itemRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
+        Item item = getById(id);
         Image image = item.getImage();
         if (image != null) {
             item.setImage(null);
@@ -190,17 +123,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDTO likes(Long itemId, Long userId) {
-        Object[] itemArguments = new Object[] { itemId };
-        String itemMessage = messageSource.getMessage("item.notFound", itemArguments, locale);
-        Item item = itemRepository.findById(itemId).orElseThrow(
-                () -> new ResourceNotFoundException(itemMessage)
-        );
-        Object[] userArguments = new Object[] { userId };
-        String userMessage = messageSource.getMessage("user.notFound", userArguments, locale);
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException(userMessage)
-        );
+    public Item likes(Long itemId, Long userId) {
+        Item item = getById(itemId);
+        User user = userService.getById(userId);
         List<User> users = item.getUsers();
         User foundUser = users.stream().filter(u -> u.getId().equals(userId)).findFirst().orElse(null);
         if (foundUser == null) {
@@ -210,24 +135,19 @@ public class ItemServiceImpl implements ItemService {
             users.remove(user);
             item.setUsers(users);
         }
-        Item newItem = itemRepository.save(item);
-        return convertToDTO(newItem);
+        return itemRepository.save(item);
     }
 
-    private ItemDTO saveItem(ItemRequest request, Item item) throws IOException {
+    private Item saveItem(ItemRequest request, Item item) throws IOException {
         if (request.getName() != null) {
             item.setName(request.getName());
         }
         if (request.getCollectionId() != null) {
-            Object[] arguments = new Object[] { request.getCollectionId() };
-            String message = messageSource.getMessage("collection.notFound", arguments, locale);
-            Collection collection = collectionRepository.findById(request.getCollectionId()).orElseThrow(
-                    () -> new ResourceNotFoundException(message)
-            );
+            Collection collection = collectionService.getById(request.getCollectionId());
             item.setCollection(collection);
         }
         if (request.getTagIds() != null && !request.getTagIds().isEmpty()) {
-            List<Tag> tags = tagRepository.findAllById(request.getTagIds());
+            List<Tag> tags = tagService.getAllById(request.getTagIds());
             item.setTags(tags);
         }
         if (request.getImage() != null && !request.getImage().isEmpty()) {
@@ -242,7 +162,7 @@ public class ItemServiceImpl implements ItemService {
         Item newItem = itemRepository.save(item);
 
         if (item.getCustomValues() != null && !item.getCustomValues().isEmpty()) {
-            customValueRepository.deleteAllByItemId(item.getId());
+            customValueService.deleteAllByItemId(item.getId());
             item.setCustomValues(new ArrayList<>());
         }
 
@@ -251,7 +171,7 @@ public class ItemServiceImpl implements ItemService {
             item.setCustomValues(newCustomValues);
         }
 
-        return convertToDTO(newItem);
+        return newItem;
     }
 
     private List<CustomValue> saveCustomValues(Item item, ItemRequest request) {
@@ -262,15 +182,11 @@ public class ItemServiceImpl implements ItemService {
                 customValue.setValue(valueRequest.getValue());
             }
             if (valueRequest.getCustomFieldId() != null) {
-                Object[] arguments = new Object[] { valueRequest.getCustomFieldId() };
-                String message = messageSource.getMessage("customField.notFound", arguments, locale);
-                CustomField customField = customFieldRepository.findById(valueRequest.getCustomFieldId()).orElseThrow(
-                        () -> new ResourceNotFoundException(message)
-                );
+                CustomField customField = customFieldService.getById(valueRequest.getCustomFieldId());
                 customValue.setCustomField(customField);
             }
             customValue.setItem(item);
-            CustomValue newCustomValue = customValueRepository.save(customValue);
+            CustomValue newCustomValue = customValueService.save(customValue);
             newCustomValues.add(newCustomValue);
         }
         return newCustomValues;

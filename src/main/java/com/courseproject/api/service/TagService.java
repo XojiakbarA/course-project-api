@@ -1,19 +1,23 @@
 package com.courseproject.api.service;
 
-import com.courseproject.api.dto.TagDTO;
+import com.courseproject.api.entity.Tag;
 import com.courseproject.api.request.TagRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
+
 public interface TagService {
 
-    Page<TagDTO> getAll(PageRequest pageRequest);
+    Page<Tag> getAll(PageRequest pageRequest);
 
-    TagDTO findById(Long id);
+    List<Tag> getAllById(Iterable<Long> id);
 
-    TagDTO store(TagRequest request);
+    Tag getById(Long id);
 
-    TagDTO update(TagRequest request, Long id);
+    Tag save(TagRequest request);
+
+    Tag update(TagRequest request, Long id);
 
     void destroy(Long id);
 

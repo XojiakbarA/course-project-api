@@ -2,8 +2,7 @@ package com.courseproject.api.validator.impl;
 
 import com.courseproject.api.entity.enums.ERole;
 import com.courseproject.api.entity.User;
-import com.courseproject.api.exception.ResourceNotFoundException;
-import com.courseproject.api.repository.UserRepository;
+import com.courseproject.api.service.UserService;
 import com.courseproject.api.validator.IsItAllowedUserID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -15,14 +14,12 @@ import javax.validation.ConstraintValidatorContext;
 public class IsItAllowedUserIDValidator implements ConstraintValidator<IsItAllowedUserID, Long> {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Override
     public boolean isValid(Long userId, ConstraintValidatorContext constraintValidatorContext) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user = userRepository.findByEmail(authentication.getName()).orElseThrow(
-                () -> new ResourceNotFoundException("User with email: " + authentication.getName() + " not found.")
-        );
+        User user = userService.getByEmail(authentication.getName());
         if (!user.getId().equals(userId)) {
             return authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(ERole.ADMIN.name()));
         }

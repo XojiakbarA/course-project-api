@@ -1,10 +1,11 @@
 package com.courseproject.api.controller;
 
-import com.courseproject.api.dto.item.ItemDTO;
+import com.courseproject.api.entity.Item;
 import com.courseproject.api.request.ItemRequest;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.ItemService;
 import com.courseproject.api.util.DefaultRequestParams;
+import com.courseproject.api.util.Mapper;
 import com.courseproject.api.validator.IsAllowedItemID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -19,6 +20,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/items")
@@ -31,75 +33,72 @@ public class ItemController {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private Mapper mapper;
+
     @GetMapping("/search/{key}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse search(@PathVariable String key) {
-        List<ItemDTO> items = itemService.search(key);
+        List<Item> items = itemService.search(key);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(items);
+        response.setData(items.stream().map(i -> mapper.convertToItemDTO(i)).collect(Collectors.toList()));
         return response;
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public RestResponse index(
+    public RestResponse getAll(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(value = "sortType", defaultValue = "ASC") Sort.Direction sortType
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by(sortType, sortBy));
-        Page<ItemDTO> items = itemService.getAll(pageRequest);
+        Page<Item> items = itemService.getAll(pageRequest);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(items.getContent());
+        response.setData(items.map(i -> mapper.convertToItemDTO(i)).getContent());
         response.setLast(items.isLast());
         return response;
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public RestResponse show(@PathVariable Long id) {
-        ItemDTO item = itemService.getById(id);
+    public RestResponse getById(@PathVariable Long id) {
+        Item item = itemService.getById(id);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(item);
+        response.setData(mapper.convertToItemDTO(item));
         return response;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
-    public RestResponse store(@Valid @ModelAttribute ItemRequest request, Locale locale) throws IOException {
-        ItemDTO item = itemService.store(request);
+    public RestResponse save(@Valid @ModelAttribute ItemRequest request, Locale locale) throws IOException {
+        Item item = itemService.save(request);
         String message = messageSource.getMessage("item.created", null, locale);
         RestResponse response = new RestResponse();
         response.setMessage(message);
-        response.setData(item);
+        response.setData(mapper.convertToItemDTO(item));
         return response;
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse update(
             @Valid @ModelAttribute ItemRequest request,
             @PathVariable @IsAllowedItemID Long id, Locale locale) throws IOException {
-        ItemDTO item = itemService.update(request, id);
+        Item item = itemService.update(request, id);
         String message = messageSource.getMessage("item.updated", null, locale);
         RestResponse response = new RestResponse();
         response.setMessage(message);
-        response.setData(item);
+        response.setData(mapper.convertToItemDTO(item));
         return response;
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse destroy(@PathVariable @IsAllowedItemID Long id, Locale locale) throws IOException {
         itemService.destroy(id);
         String message = messageSource.getMessage("item.deleted", null, locale);
@@ -110,7 +109,6 @@ public class ItemController {
 
     @DeleteMapping("/{id}/images")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse destroyImage(@PathVariable @IsAllowedItemID Long id, Locale locale) throws IOException {
         itemService.destroyImage(id);
         String message = messageSource.getMessage("image.deleted", null, locale);
@@ -121,12 +119,11 @@ public class ItemController {
 
     @PutMapping("/{itemId}/likes/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse likes(@PathVariable Long itemId, @PathVariable Long userId) {
-        ItemDTO item = itemService.likes(itemId, userId);
+        Item item = itemService.likes(itemId, userId);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(item);
+        response.setData(mapper.convertToItemDTO(item));
         return response;
     }
 

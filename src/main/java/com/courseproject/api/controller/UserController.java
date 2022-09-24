@@ -1,12 +1,13 @@
 package com.courseproject.api.controller;
 
-import com.courseproject.api.dto.UserDTO;
+import com.courseproject.api.entity.User;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.request.RegisterRequest;
 import com.courseproject.api.request.UserRequest;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.UserService;
 import com.courseproject.api.util.DefaultRequestParams;
+import com.courseproject.api.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
@@ -30,51 +31,50 @@ public class UserController {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private Mapper mapper;
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
-    public RestResponse index(
+    public RestResponse getAll(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(value = "sortType", defaultValue = "ASC") Sort.Direction sortType
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, sortType, sortBy);
-        Page<UserDTO> users = userService.getAll(pageRequest);
+        Page<User> users = userService.getAll(pageRequest);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(users.getContent());
+        response.setData(users.map(u -> mapper.convertToUserDTO(u)).getContent());
         response.setLast(users.isLast());
         return response;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ResponseBody
-    public RestResponse store(@Valid @ModelAttribute RegisterRequest request, Locale locale) throws IOException {
-        UserDTO user = userService.store(request);
+    public RestResponse save(@Valid @ModelAttribute RegisterRequest request, Locale locale) throws IOException {
+        User user = userService.save(request);
         String message = messageSource.getMessage("user.created", null, locale);
         RestResponse response = new RestResponse();
         response.setMessage(message);
-        response.setData(user);
+        response.setData(mapper.convertToUserDTO(user));
         return response;
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse update(@Valid @ModelAttribute UserRequest request, @PathVariable Long id, Locale locale) throws IOException, ResourceNotFoundException {
-        UserDTO user = userService.update(request, id);
+        User user = userService.update(request, id);
         String message = messageSource.getMessage("user.updated", null, locale);
         RestResponse response = new RestResponse();
         response.setMessage(message);
-        response.setData(user);
+        response.setData(mapper.convertToUserDTO(user));
         return response;
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse destroy(@PathVariable Long id, Locale locale) throws IOException {
         userService.destroy(id);
@@ -86,7 +86,6 @@ public class UserController {
 
     @DeleteMapping("/{id}/images")
     @ResponseStatus(HttpStatus.OK)
-    @ResponseBody
     public RestResponse destroyImage(@PathVariable Long id, Locale locale) throws IOException {
         userService.destroyImage(id);
         String message = messageSource.getMessage("image.deleted", null, locale);

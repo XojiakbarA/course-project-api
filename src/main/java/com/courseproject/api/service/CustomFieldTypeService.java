@@ -1,11 +1,13 @@
 package com.courseproject.api.service;
 
-import com.courseproject.api.dto.CustomFieldTypeDTO;
+import com.courseproject.api.entity.CustomFieldType;
 
 import java.util.List;
 
 public interface CustomFieldTypeService {
 
-    List<CustomFieldTypeDTO> findAll();
+    List<CustomFieldType> getAll();
+
+    CustomFieldType getById(Long id);
 
 }
