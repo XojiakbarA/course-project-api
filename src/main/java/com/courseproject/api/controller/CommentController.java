@@ -1,10 +1,11 @@
 package com.courseproject.api.controller;
 
-import com.courseproject.api.dto.comment.CommentDTO;
+import com.courseproject.api.entity.Comment;
 import com.courseproject.api.request.CommentRequest;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.CommentService;
 import com.courseproject.api.util.DefaultRequestParams;
+import com.courseproject.api.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
@@ -29,19 +30,22 @@ public class CommentController {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private Mapper mapper;
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public RestResponse index(
+    public RestResponse getAll(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(value = "sortType", defaultValue = "ASC") Sort.Direction sortType
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, sortType, sortBy);
-        Page<CommentDTO> comments = commentService.getAll(pageRequest);
+        Page<Comment> comments = commentService.getAll(pageRequest);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(comments.getContent());
+        response.setData(comments.map(c -> mapper.convertToCommentDTO(c)).getContent());
         response.setLast(comments.isLast());
         return response;
     }
@@ -49,12 +53,12 @@ public class CommentController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public RestResponse store(@Valid @RequestBody CommentRequest request, Locale locale) {
-        CommentDTO comment = commentService.store(request);
+    public RestResponse save(@Valid @RequestBody CommentRequest request, Locale locale) {
+        Comment comment = commentService.save(request);
         String message = messageSource.getMessage("comment.created", null, locale);
         RestResponse response = new RestResponse();
         response.setMessage(message);
-        response.setData(comment);
+        response.setData(mapper.convertToCommentDTO(comment));
         return response;
     }
 
@@ -62,11 +66,11 @@ public class CommentController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse update(@Valid @RequestBody CommentRequest request, @PathVariable Long id, Locale locale) {
-        CommentDTO comment = commentService.update(request, id);
+        Comment comment = commentService.update(request, id);
         String message = messageSource.getMessage("comment.updated", null, locale);
         RestResponse response = new RestResponse();
         response.setMessage(message);
-        response.setData(comment);
+        response.setData(mapper.convertToCommentDTO(comment));
         return response;
     }
 
@@ -83,11 +87,11 @@ public class CommentController {
 
     @MessageMapping("/comments/create")
     @SendTo("/comments")
-    public RestResponse storeSocket(@Valid @RequestBody CommentRequest request) {
-        CommentDTO comment = commentService.store(request);
+    public RestResponse saveSocket(@Valid @RequestBody CommentRequest request) {
+        Comment comment = commentService.save(request);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(comment);
+        response.setData(mapper.convertToCommentDTO(comment));
         return response;
     }
 

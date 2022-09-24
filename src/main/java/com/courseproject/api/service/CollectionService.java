@@ -1,6 +1,6 @@
 package com.courseproject.api.service;
 
-import com.courseproject.api.dto.collection.CollectionDTO;
+import com.courseproject.api.entity.Collection;
 import com.courseproject.api.request.CollectionRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -9,15 +9,15 @@ import java.io.IOException;
 
 public interface CollectionService {
 
-    Page<CollectionDTO> getAll(PageRequest pageRequest);
+    Page<Collection> getAll(PageRequest pageRequest);
 
-    Page<CollectionDTO> getByUserId(Long id, PageRequest pageRequest);
+    Page<Collection> getByUserId(Long id, PageRequest pageRequest);
 
-    CollectionDTO getById(Long id);
+    Collection getById(Long id);
 
-    CollectionDTO store(CollectionRequest request) throws IOException;
+    Collection save(CollectionRequest request) throws IOException;
 
-    CollectionDTO update(CollectionRequest request, Long id) throws IOException;
+    Collection update(CollectionRequest request, Long id) throws IOException;
 
     void destroy(Long id) throws IOException;
 

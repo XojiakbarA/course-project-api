@@ -1,10 +1,11 @@
 package com.courseproject.api.controller;
 
-import com.courseproject.api.dto.TagDTO;
+import com.courseproject.api.entity.Tag;
 import com.courseproject.api.request.TagRequest;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.TagService;
 import com.courseproject.api.util.DefaultRequestParams;
+import com.courseproject.api.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
@@ -27,42 +28,45 @@ public class TagController {
     @Autowired
     private MessageSource messageSource;
 
+    @Autowired
+    private Mapper mapper;
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public RestResponse index(
+    public RestResponse getAll(
             @RequestParam(value = "page", defaultValue = DefaultRequestParams.PAGE) int page,
             @RequestParam(value = "size", defaultValue = Integer.MAX_VALUE + "") int size,
             @RequestParam(value = "sortBy", defaultValue = "id") String sortBy,
             @RequestParam(value = "sortType", defaultValue = "ASC") Sort.Direction sortType
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, sortType, sortBy);
-        Page<TagDTO> tags = tagService.getAll(pageRequest);
+        Page<Tag> tags = tagService.getAll(pageRequest);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(tags.getContent());
+        response.setData(tags.map(t -> mapper.convertToTagDTO(t)).getContent());
         response.setLast(tags.isLast());
         return response;
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public RestResponse show(@PathVariable Long id) {
-        TagDTO tag = tagService.findById(id);
+    public RestResponse getById(@PathVariable Long id) {
+        Tag tag = tagService.getById(id);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(tag);
+        response.setData(mapper.convertToTagDTO(tag));
         return response;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public RestResponse store(@Valid @RequestBody TagRequest request, Locale locale) {
-        TagDTO tag = tagService.store(request);
+    public RestResponse save(@Valid @RequestBody TagRequest request, Locale locale) {
+        Tag tag = tagService.save(request);
         String message = messageSource.getMessage("tag.created", null, locale);
         RestResponse response = new RestResponse();
         response.setMessage(message);
-        response.setData(tag);
+        response.setData(mapper.convertToTagDTO(tag));
         return response;
     }
 
@@ -70,11 +74,11 @@ public class TagController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAuthority('ADMIN')")
     public RestResponse update(@Valid @RequestBody TagRequest request, @PathVariable Long id, Locale locale) {
-        TagDTO tag = tagService.update(request, id);
+        Tag tag = tagService.update(request, id);
         String message = messageSource.getMessage("tag.updated", null, locale);
         RestResponse response = new RestResponse();
         response.setMessage(message);
-        response.setData(tag);
+        response.setData(mapper.convertToTagDTO(tag));
         return response;
     }
 

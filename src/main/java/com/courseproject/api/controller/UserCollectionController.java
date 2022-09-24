@@ -1,9 +1,10 @@
 package com.courseproject.api.controller;
 
-import com.courseproject.api.dto.collection.CollectionDTO;
+import com.courseproject.api.entity.Collection;
 import com.courseproject.api.response.RestResponse;
 import com.courseproject.api.service.CollectionService;
 import com.courseproject.api.util.DefaultRequestParams;
+import com.courseproject.api.util.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,9 @@ public class UserCollectionController {
     @Autowired
     private CollectionService collectionService;
 
+    @Autowired
+    private Mapper mapper;
+
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public RestResponse getByUserId(
@@ -28,10 +32,10 @@ public class UserCollectionController {
             @PathVariable Long userId
     ) {
         PageRequest pageRequest = PageRequest.of(page, size, sortType, sortBy);
-        Page<CollectionDTO> collections = collectionService.getByUserId(userId, pageRequest);
+        Page<Collection> collections = collectionService.getByUserId(userId, pageRequest);
         RestResponse response = new RestResponse();
         response.setMessage("OK");
-        response.setData(collections.getContent());
+        response.setData(collections.map(c -> mapper.convertToCollectionDTO(c)).getContent());
         response.setLast(collections.isLast());
         return response;
     }

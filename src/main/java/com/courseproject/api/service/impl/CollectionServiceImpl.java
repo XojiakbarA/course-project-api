@@ -1,15 +1,10 @@
 package com.courseproject.api.service.impl;
 
-import com.courseproject.api.dto.collection.CollectionDTO;
 import com.courseproject.api.entity.*;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.*;
-import com.courseproject.api.request.CollectionCustomFieldRequest;
 import com.courseproject.api.request.CollectionRequest;
-import com.courseproject.api.service.CollectionService;
-import com.courseproject.api.service.ImageService;
-import org.modelmapper.Converter;
-import org.modelmapper.ModelMapper;
+import com.courseproject.api.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -19,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,16 +26,13 @@ public class CollectionServiceImpl implements CollectionService {
     private CollectionRepository collectionRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    private TopicRepository topicRepository;
+    private TopicService topicService;
 
     @Autowired
-    private CustomFieldRepository customFieldRepository;
-
-    @Autowired
-    private CustomFieldTypeRepository customFieldTypeRepository;
+    private CustomFieldService customFieldService;
 
     @Autowired
     private ImageService imageService;
@@ -49,62 +40,40 @@ public class CollectionServiceImpl implements CollectionService {
     @Autowired
     private MessageSource messageSource;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    private CollectionDTO convertToDTO(Collection collection) {
-        Converter<java.util.Collection<Item>, Long> converter = c -> (long) c.getSource().size();
-        return modelMapper
-                .typeMap(Collection.class, CollectionDTO.class)
-                .addMappings(m -> m.using(converter).map(Collection::getItems, CollectionDTO::setItemsCount))
-                .map(collection);
+    @Override
+    public Page<Collection> getAll(PageRequest pageRequest) {
+        return collectionRepository.findAll(pageRequest);
     }
 
     @Override
-    public Page<CollectionDTO> getAll(PageRequest pageRequest) {
-        return collectionRepository.findAll(pageRequest).map(this::convertToDTO);
+    public Page<Collection> getByUserId(Long id, PageRequest pageRequest) {
+        return collectionRepository.findByUserId(id, pageRequest);
     }
 
     @Override
-    public Page<CollectionDTO> getByUserId(Long id, PageRequest pageRequest) {
-        return collectionRepository.findByUserId(id, pageRequest).map(this::convertToDTO);
-    }
-
-    @Override
-    public CollectionDTO getById(Long id) {
+    public Collection getById(Long id) {
         Object[] arguments = new Object[] { id };
         String message = messageSource.getMessage("collection.notFound", arguments, locale);
-        Collection collection = collectionRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
-        return convertToDTO(collection);
+        return collectionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(message));
     }
 
     @Override
     @Transactional
-    public CollectionDTO store(CollectionRequest request) throws IOException {
+    public Collection save(CollectionRequest request) throws IOException {
         Collection collection = new Collection();
         return saveCollection(collection, request);
     }
 
     @Override
     @Transactional
-    public CollectionDTO update(CollectionRequest request, Long id) throws IOException {
-        Object[] arguments = new Object[] { id };
-        String message = messageSource.getMessage("collection.notFound", arguments, locale);
-        Collection collection = collectionRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
+    public Collection update(CollectionRequest request, Long id) throws IOException {
+        Collection collection = getById(id);
         return saveCollection(collection, request);
     }
 
     @Override
     public void destroy(Long id) throws IOException {
-        Object[] arguments = new Object[] { id };
-        String message = messageSource.getMessage("collection.notFound", arguments, locale);
-        Collection collection = collectionRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
+        Collection collection = getById(id);
         Image image = collection.getImage();
         if (image != null) {
             imageService.delete(image.getId());
@@ -114,11 +83,7 @@ public class CollectionServiceImpl implements CollectionService {
 
     @Override
     public void destroyImage(Long id) throws IOException {
-        Object[] arguments = new Object[] { id };
-        String message = messageSource.getMessage("collection.notFound", arguments, locale);
-        Collection collection = collectionRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
+        Collection collection = getById(id);
         Image image = collection.getImage();
         if (image != null) {
             collection.setImage(null);
@@ -127,7 +92,7 @@ public class CollectionServiceImpl implements CollectionService {
         collectionRepository.save(collection);
     }
 
-    private CollectionDTO saveCollection(Collection collection, CollectionRequest request) throws IOException {
+    private Collection saveCollection(Collection collection, CollectionRequest request) throws IOException {
         if (request.getName() != null) {
             collection.setName(request.getName());
         }
@@ -135,19 +100,11 @@ public class CollectionServiceImpl implements CollectionService {
             collection.setDescription(request.getDescription());
         }
         if (request.getUserId() != null) {
-            Object[] arguments = new Object[] { request.getUserId() };
-            String message = messageSource.getMessage("user.notFound", arguments, locale);
-            User user = userRepository.findById(request.getUserId()).orElseThrow(
-                    () -> new ResourceNotFoundException(message)
-            );
+            User user = userService.getById(request.getUserId());
             collection.setUser(user);
         }
         if (request.getTopicId() != null) {
-            Object[] arguments = new Object[] { request.getTopicId() };
-            String message = messageSource.getMessage("topic.notFound", arguments, locale);
-            Topic topic = topicRepository.findById(request.getTopicId()).orElseThrow(
-                    () -> new ResourceNotFoundException(message)
-            );
+            Topic topic = topicService.getById(request.getTopicId());
             collection.setTopic(topic);
         }
         if (request.getImage() != null && !request.getImage().isEmpty()) {
@@ -162,37 +119,11 @@ public class CollectionServiceImpl implements CollectionService {
         Collection newCollection = collectionRepository.save(collection);
 
         if (request.getCustomFields() != null && !request.getCustomFields().isEmpty()) {
-            List<CustomField> newCustomFields = saveCustomFields(collection, request);
+            List<CustomField> newCustomFields = customFieldService.saveByCollection(collection, request.getCustomFields());
             collection.setCustomFields(newCustomFields);
         }
 
-        return convertToDTO(newCollection);
-    }
-
-    private List<CustomField> saveCustomFields(Collection collection, CollectionRequest request) {
-        if (collection.getCustomFields() != null && !collection.getCustomFields().isEmpty()) {
-            customFieldRepository.deleteAllByCollectionId(collection.getId());
-            collection.setCustomFields(new ArrayList<>());
-        }
-        List<CustomField> newCustomFields = new ArrayList<>();
-        for (CollectionCustomFieldRequest fieldRequest : request.getCustomFields()) {
-            CustomField customField = new CustomField();
-            if (fieldRequest.getName() != null) {
-                customField.setName(fieldRequest.getName());
-            }
-            if (fieldRequest.getCustomFieldTypeId() != null) {
-                Object[] arguments = new Object[] { fieldRequest.getCustomFieldTypeId() };
-                String message = messageSource.getMessage("customFieldType.notFound", arguments, locale);
-                CustomFieldType customFieldType = customFieldTypeRepository.findById(fieldRequest.getCustomFieldTypeId()).orElseThrow(
-                        () -> new ResourceNotFoundException(message)
-                );
-                customField.setCustomFieldType(customFieldType);
-            }
-            customField.setCollection(collection);
-            CustomField newCustomField = customFieldRepository.save(customField);
-            newCustomFields.add(newCustomField);
-        }
-        return newCustomFields;
+        return newCollection;
     }
 
 }

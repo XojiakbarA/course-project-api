@@ -1,6 +1,6 @@
 package com.courseproject.api.service;
 
-import com.courseproject.api.dto.item.ItemDTO;
+import com.courseproject.api.entity.Item;
 import com.courseproject.api.request.ItemRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,24 +10,24 @@ import java.util.List;
 
 public interface ItemService {
 
-    List<ItemDTO> search(String key);
+    List<Item> search(String key);
 
-    Page<ItemDTO> getAll(PageRequest pageRequest);
+    Page<Item> getAll(PageRequest pageRequest);
 
-    Page<ItemDTO> getByCollectionId(Long collectionId, PageRequest request);
+    Page<Item> getByCollectionId(Long collectionId, PageRequest request);
 
-    Page<ItemDTO> getByTagId(Long tagId, PageRequest pageRequest);
+    Page<Item> getByTagId(Long tagId, PageRequest pageRequest);
 
-    ItemDTO getById(Long id);
+    Item getById(Long id);
 
-    ItemDTO store(ItemRequest request) throws IOException;
+    Item save(ItemRequest request) throws IOException;
 
-    ItemDTO update(ItemRequest request, Long id) throws IOException;
+    Item update(ItemRequest request, Long id) throws IOException;
 
     void destroy(Long id) throws IOException;
 
     void destroyImage(Long id) throws IOException;
 
-    ItemDTO likes(Long itemId, Long userId);
+    Item likes(Long itemId, Long userId);
 
 }

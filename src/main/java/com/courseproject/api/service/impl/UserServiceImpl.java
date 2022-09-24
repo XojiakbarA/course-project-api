@@ -1,23 +1,22 @@
 package com.courseproject.api.service.impl;
 
-import com.courseproject.api.dto.UserDTO;
 import com.courseproject.api.entity.*;
 import com.courseproject.api.entity.enums.EAuthProvider;
 import com.courseproject.api.entity.enums.ERole;
 import com.courseproject.api.exception.ResourceExistsException;
 import com.courseproject.api.exception.ResourceNotFoundException;
-import com.courseproject.api.repository.RoleRepository;
 import com.courseproject.api.repository.UserRepository;
 import com.courseproject.api.request.RegisterRequest;
 import com.courseproject.api.request.UserRequest;
 import com.courseproject.api.service.ImageService;
+import com.courseproject.api.service.RoleService;
 import com.courseproject.api.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +34,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
+    private RoleService roleService;
 
     @Autowired
     private ImageService imageService;
@@ -46,25 +45,33 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
-    private UserDTO convertToDTO(User user) {
-        return modelMapper.map(user, UserDTO.class);
+    @Override
+    public Page<User> getAll(PageRequest pageRequest) {
+        return userRepository.findAll(pageRequest);
     }
 
     @Override
-    public Page<UserDTO> getAll(PageRequest pageRequest) {
-        return userRepository.findAll(pageRequest).map(this::convertToDTO);
-    }
-
-    @Override
-    public UserDTO update(UserRequest request, Long id) throws IOException {
+    public User getById(Long id) {
         Object[] arguments = new Object[] { id };
         String message = messageSource.getMessage("user.notFound", arguments, locale);
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(message));
+    }
+
+    @Override
+    public User getByEmail(String email) {
+        Object[] arguments = new Object[]{email};
+        String message = messageSource.getMessage("user.email.notFound", arguments, locale);
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(message));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public User update(UserRequest request, Long id) throws IOException {
+        User user = getById(id);
         if (request.getFirstName() != null) {
             user.setFirstName(request.getFirstName());
         }
@@ -75,7 +82,7 @@ public class UserServiceImpl implements UserService {
             user.setIsNonLocked(request.getIsNonLocked());
         }
         if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
-            List<Role> roles = roleRepository.findAllById(request.getRoleIds());
+            List<Role> roles = roleService.getAllById(request.getRoleIds());
             user.setRoles(roles);
         }
         if (request.getImage() != null && !request.getImage().isEmpty()) {
@@ -84,23 +91,22 @@ public class UserServiceImpl implements UserService {
             image.setValue(imageValue);
             user.setImage(image);
         }
-        User updatedUser = userRepository.save(user);
-        return convertToDTO(updatedUser);
+        return userRepository.save(user);
     }
 
     @Override
-    public UserDTO store(RegisterRequest request) throws IOException {
-        String message = messageSource.getMessage("user.notFound", null, locale);
-        if (userRepository.existsByEmail(request.getEmail())) {
+    public User save(RegisterRequest request) throws IOException {
+        String message = messageSource.getMessage("user.email.taken", null, locale);
+        if (existsByEmail(request.getEmail())) {
             throw new ResourceExistsException(message);
         }
         User user = new User();
 
         List<Role> roles = new ArrayList<>();
         if (request.getRoleIds() != null && !request.getRoleIds().isEmpty()) {
-            roles = roleRepository.findAllById(request.getRoleIds());
+            roles = roleService.getAllById(request.getRoleIds());
         } else {
-            Role role = roleRepository.findByName(ERole.USER).orElse(null);
+            Role role = roleService.getByName(ERole.USER);
             roles.add(role);
         }
         if (request.getIsNonLocked() != null) {
@@ -118,17 +124,12 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRoles(roles);
         user.setProvider(EAuthProvider.local);
-        User newUser = userRepository.save(user);
-        return convertToDTO(newUser);
+        return userRepository.save(user);
     }
 
     @Override
     public void destroy(Long id) throws IOException {
-        Object[] arguments = new Object[] { id };
-        String message = messageSource.getMessage("user.notFound", arguments, locale);
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
+        User user = getById(id);
         Image image = user.getImage();
         if (image != null) {
             imageService.delete(image.getId());
@@ -138,25 +139,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void destroyImage(Long id) throws IOException {
-        Object[] arguments = new Object[] { id };
-        String message = messageSource.getMessage("user.notFound", arguments, locale);
-        User user = userRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException(message)
-        );
+        User user = getById(id);
         Image image = user.getImage();
         if (image != null) {
             user.setImage(null);
             imageService.delete(image.getId());
         }
         userRepository.save(user);
-    }
-
-    @Override
-    public UserDTO findByEmail(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("User with email: " + email + " not found.")
-        );
-        return convertToDTO(user);
     }
 
 }

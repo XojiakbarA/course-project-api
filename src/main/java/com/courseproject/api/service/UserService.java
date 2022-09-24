@@ -1,6 +1,6 @@
 package com.courseproject.api.service;
 
-import com.courseproject.api.dto.UserDTO;
+import com.courseproject.api.entity.User;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.request.RegisterRequest;
 import com.courseproject.api.request.UserRequest;
@@ -11,16 +11,20 @@ import java.io.IOException;
 
 public interface UserService {
 
-    Page<UserDTO> getAll(PageRequest pageRequest);
+    Page<User> getAll(PageRequest pageRequest);
 
-    UserDTO update(UserRequest request, Long id) throws IOException, ResourceNotFoundException;
+    User getById(Long id);
 
-    UserDTO store (RegisterRequest request) throws IOException;
+    User getByEmail(String email);
+
+    boolean existsByEmail(String email);
+
+    User update(UserRequest request, Long id) throws IOException, ResourceNotFoundException;
+
+    User save (RegisterRequest request) throws IOException;
 
     void destroy(Long id) throws IOException;
 
     void destroyImage(Long id) throws IOException;
-
-    UserDTO findByEmail(String email);
 
 }
