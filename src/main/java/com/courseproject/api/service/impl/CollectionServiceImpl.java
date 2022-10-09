@@ -119,7 +119,7 @@ public class CollectionServiceImpl implements CollectionService {
         Collection newCollection = collectionRepository.save(collection);
 
         if (request.getCustomFields() != null && !request.getCustomFields().isEmpty()) {
-            List<CustomField> newCustomFields = customFieldService.saveByCollection(collection, request.getCustomFields());
+            List<CustomField> newCustomFields = customFieldService.saveAllByCollection(collection, request.getCustomFields());
             collection.setCustomFields(newCustomFields);
         }
 

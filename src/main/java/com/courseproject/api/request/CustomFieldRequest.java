@@ -3,7 +3,7 @@ package com.courseproject.api.request;
 import lombok.Data;
 
 @Data
-public class CollectionCustomFieldRequest {
+public class CustomFieldRequest {
 
     private String name;
 

@@ -3,7 +3,6 @@ package com.courseproject.api.service.impl;
 import com.courseproject.api.entity.*;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.*;
-import com.courseproject.api.request.ItemCustomValueRequest;
 import com.courseproject.api.request.ItemRequest;
 import com.courseproject.api.service.*;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -161,35 +159,12 @@ public class ItemServiceImpl implements ItemService {
         }
         Item newItem = itemRepository.save(item);
 
-        if (item.getCustomValues() != null && !item.getCustomValues().isEmpty()) {
-            customValueService.deleteAllByItemId(item.getId());
-            item.setCustomValues(new ArrayList<>());
-        }
-
         if (request.getCustomValues() != null && !request.getCustomValues().isEmpty()) {
-            List<CustomValue> newCustomValues = saveCustomValues(item, request);
-            item.setCustomValues(newCustomValues);
+            List<CustomValue> customValues = customValueService.saveAllByItem(item, request.getCustomValues());
+            item.setCustomValues(customValues);
         }
 
         return newItem;
-    }
-
-    private List<CustomValue> saveCustomValues(Item item, ItemRequest request) {
-        List<CustomValue> newCustomValues = new ArrayList<>();
-        for (ItemCustomValueRequest valueRequest : request.getCustomValues()) {
-            CustomValue customValue = new CustomValue();
-            if (valueRequest.getValue() != null) {
-                customValue.setValue(valueRequest.getValue());
-            }
-            if (valueRequest.getCustomFieldId() != null) {
-                CustomField customField = customFieldService.getById(valueRequest.getCustomFieldId());
-                customValue.setCustomField(customField);
-            }
-            customValue.setItem(item);
-            CustomValue newCustomValue = customValueService.save(customValue);
-            newCustomValues.add(newCustomValue);
-        }
-        return newCustomValues;
     }
 
 }
