@@ -5,7 +5,7 @@ import com.courseproject.api.entity.CustomField;
 import com.courseproject.api.entity.CustomFieldType;
 import com.courseproject.api.exception.ResourceNotFoundException;
 import com.courseproject.api.repository.CustomFieldRepository;
-import com.courseproject.api.request.CollectionCustomFieldRequest;
+import com.courseproject.api.request.CustomFieldRequest;
 import com.courseproject.api.service.CustomFieldService;
 import com.courseproject.api.service.CustomFieldTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,28 +39,28 @@ public class CustomFieldServiceImpl implements CustomFieldService {
     }
 
     @Override
-    public CustomField save(CustomField customField) {
+    public CustomField save(Collection collection, CustomFieldRequest request) {
+        CustomField customField = new CustomField();
+        if (request.getName() != null) {
+            customField.setName(request.getName());
+        }
+        if (request.getCustomFieldTypeId() != null) {
+            CustomFieldType customFieldType = customFieldTypeService.getById(request.getCustomFieldTypeId());
+            customField.setCustomFieldType(customFieldType);
+        }
+        customField.setCollection(collection);
         return customFieldRepository.save(customField);
     }
 
     @Override
-    public List<CustomField> saveByCollection(Collection collection, List<CollectionCustomFieldRequest> customFieldRequests) {
+    public List<CustomField> saveAllByCollection(Collection collection, List<CustomFieldRequest> requests) {
         if (collection.getCustomFields() != null && !collection.getCustomFields().isEmpty()) {
             deleteAllByCollectionId(collection.getId());
             collection.setCustomFields(new ArrayList<>());
         }
         List<CustomField> newCustomFields = new ArrayList<>();
-        for (CollectionCustomFieldRequest fieldRequest : customFieldRequests) {
-            CustomField customField = new CustomField();
-            if (fieldRequest.getName() != null) {
-                customField.setName(fieldRequest.getName());
-            }
-            if (fieldRequest.getCustomFieldTypeId() != null) {
-                CustomFieldType customFieldType = customFieldTypeService.getById(fieldRequest.getCustomFieldTypeId());
-                customField.setCustomFieldType(customFieldType);
-            }
-            customField.setCollection(collection);
-            CustomField newCustomField = save(customField);
+        for (CustomFieldRequest request : requests) {
+            CustomField newCustomField = save(collection, request);
             newCustomFields.add(newCustomField);
         }
         return newCustomFields;

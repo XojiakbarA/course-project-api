@@ -33,14 +33,14 @@ public class CollectionRequest {
 
     private MultipartFile image;
 
-    private List<CollectionCustomFieldRequest> customFields;
+    private List<CustomFieldRequest> customFields;
 
     @JsonAnySetter
     public void setCustomFields(List<JSONObject> customFields) {
         this.customFields = customFields.stream().map(c -> {
             ObjectMapper mapper = new ObjectMapper();
             try {
-                return mapper.readValue(c.toString(), CollectionCustomFieldRequest.class);
+                return mapper.readValue(c.toString(), CustomFieldRequest.class);
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
